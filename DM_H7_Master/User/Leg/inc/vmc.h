@@ -23,8 +23,8 @@
 #define VEL 1
 #define ACC 2
 
-#define MAX_TORQUE_LEG_T 10.0f
-#define MAX_TORQUE_LEG_W 2.5f
+#define MAX_TORQUE_LEG_T 15.0f
+#define MAX_TORQUE_LEG_W 3.0f
 #define MAX_LEG_LENGTH 0.35f
 #define MIN_LEG_LENGTH 0.12f
 
