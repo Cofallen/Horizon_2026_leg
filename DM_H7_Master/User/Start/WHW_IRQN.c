@@ -87,10 +87,11 @@ void StartGimbalTask(void const *argument)
     // BM_set_ID(&hfdcan1, 2, 1);
     BM_EnableDisable(&hfdcan2, 0x02);
     // BM_save_flash(&hfdcan1);
+    osDelay(10);
     ChassisL_Init(&ALL_MOTOR, &Leg_l);
     ChassisR_Init(&ALL_MOTOR, &Leg_r);
-    Vmc_Init(&Leg_l, 0.12);
-    Vmc_Init(&Leg_r, 0.12);
+    Vmc_Init(&Leg_l, 0.22);
+    Vmc_Init(&Leg_r, 0.22);
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
@@ -102,14 +103,14 @@ void StartGimbalTask(void const *argument)
         RUI_V_CONTAL.DWT_TIME.Move_Dtime = DWT_GetDeltaT(&RUI_V_CONTAL.DWT_TIME.Move_DWT_Count);
         Vmc_calcL(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Vmc_calcR(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // ChassisL_UpdateState(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        ChassisL_UpdateState(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         // Chassis_GetStatus(&Leg_l, &Leg_r);
-        // Chassis_StateHandle(&Leg_l, &Leg_r);
-        // ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
+        Chassis_StateHandle(&Leg_l, &Leg_r);
+        ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
         osDelay(1);
     }
 }
@@ -122,8 +123,21 @@ void StartMonitorTask(void const * argument)
 
     for(;;)
     {
-        BM_Send_torque(&hfdcan2, 0x032, 0, 0, 0, 0 );
-        osDelay(2);
+        // BM_Send_torque(&hfdcan2, 0x032, 0,0,0,0);
+        // BM_Send_torque(&hfdcan2, 0x032, 0, 
+        //                     Leg_r.torque_send.T1,
+        //                     0,
+        //                     Leg_r.torque_send.T2);
+        BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
+                            Leg_r.torque_send.T1,
+                            Leg_l.torque_send.T2,
+                            Leg_r.torque_send.T2);
+        osDelay(1);
+        // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, Leg_r.torque_send.Tw, 0);
+        DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0);
+
+        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
+        osDelay(1);
     }
 }
 

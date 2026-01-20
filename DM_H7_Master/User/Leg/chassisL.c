@@ -17,7 +17,7 @@ void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {
     // BM_EnableDisable()
     ALL_MOTOR.left_front.DATA.pos_init_rad = 0.16f;
-    ALL_MOTOR.left_back.DATA.pos_init_rad  = 3.04f;
+    ALL_MOTOR.left_back.DATA.pos_init_rad  = 3.04f;   // 读取应取负
     ALL_MOTOR.left_wheel.DATA.Angle_Init   = ALL_MOTOR.left_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->left_front.PID_P, 1.0f, 0.1f, PID_P_LF,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
@@ -136,7 +136,7 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     // 限幅
     (object->LQR.torque_setT[0] > object->limit.T_max) ? (object->LQR.torque_setT[0] = object->limit.T_max) : (object->LQR.torque_setT[0] < -object->limit.T_max) ? (object->LQR.torque_setT[0] = -object->limit.T_max) : 0;
     (object->LQR.torque_setT[1] > object->limit.T_max) ? (object->LQR.torque_setT[1] = object->limit.T_max) : (object->LQR.torque_setT[1] < -object->limit.T_max) ? (object->LQR.torque_setT[1] = -object->limit.T_max) : 0;
-    (object->LQR.torque_setW > object->limit.W_max) ? (object->LQR.torque_setW = -object->limit.W_max) : (object->LQR.torque_setW < -object->limit.W_max) ? (object->LQR.torque_setW = -object->limit.W_max) : 0;
+    (object->LQR.torque_setW > object->limit.W_max) ? (object->LQR.torque_setW = object->limit.W_max) : (object->LQR.torque_setW < -object->limit.W_max) ? (object->LQR.torque_setW = -object->limit.W_max) : 0;
     // if (dbus->Remote.S2_u8 == 1)
     // {
     //   object->LQR.torque_setT[0] = 0.0f;
@@ -155,13 +155,17 @@ void Chassis_SendTorque()
     static uint8_t temp = 1;
     uint8_t count = 0;
     if (temp == 1){
-      mit_ctrl(&hfdcan1, 0x01, 0,0,0,0, Leg_l.torque_send.T1);
-      mit_ctrl(&hfdcan1, 0x03, 0,0,0,0, Leg_l.torque_send.T2);
-      // mit_ctrl(&hcan1, 0x01, 0, 0, 0, 0, 0);
-      // mit_ctrl(&hcan1, 0x03, 0, 0, 0, 0, 0);
-      // DJI_Torque_Control(&hcan2, 0x200, 0.0f, 0.0f, Leg_l.LQR.torque_setW, 0.0f);
-      // DJI_Torque_Control(&hcan2, 0x200, -Leg_r.LQR.torque_setW, 0.0f, 0.0f, 0.0f);
-      DJI_Torque_Control(&hfdcan2, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0.0f);
+      // BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
+      //                                 Leg_r.torque_send.T1,
+      //                                Leg_l.torque_send.T2,
+      //                                Leg_r.torque_send.T2);
+        BM_Send_torque(&hfdcan2, 0x032, 0, 
+                                  Leg_r.torque_send.T1,
+                                  0,
+                                  Leg_r.torque_send.T2);
+        DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, Leg_r.torque_send.Tw, 0.0f);
+
+      // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
       temp = -temp;
     }
     else{
@@ -285,14 +289,16 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     }
 }
 
-// 不同状态处理
+// 不同状态处理，用于切换K阵
 void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
 {
     int machine_state = left->status.stand;
     static uint16_t time = 0;   // 板凳起立时间
 
-    Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
-    Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
+    // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
+    // Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
+    memcpy(left->LQR.K , ChassisL_LQR_K, sizeof(ChassisL_LQR_K));
+    memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(ChassisR_LQR_K));
 
     if (machine_state == 1) // 倒地
     {
