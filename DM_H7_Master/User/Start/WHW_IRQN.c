@@ -90,8 +90,8 @@ void StartGimbalTask(void const *argument)
     osDelay(10);
     ChassisL_Init(&ALL_MOTOR, &Leg_l);
     ChassisR_Init(&ALL_MOTOR, &Leg_r);
-    Vmc_Init(&Leg_l, 0.22);
-    Vmc_Init(&Leg_r, 0.22);
+    Vmc_Init(&Leg_l, 0.16);
+    Vmc_Init(&Leg_r, 0.16);
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
@@ -154,6 +154,13 @@ void StartK3debugTask(void const * argument)
     {
 //		k3debug_task(&ALL_MOTOR, &WHW_V_DBUS);
 //        DM_test(&IMU_Data);
+        VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
+                       ALL_MOTOR.left_back.DATA.voltage,
+                         ALL_MOTOR.right_front.DATA.voltage,
+                        ALL_MOTOR.right_back.DATA.voltage,
+                        0,0,
+                        (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
+                        Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         vTaskDelayUntil(&currentTimeK3debug, 1);
     }
 }

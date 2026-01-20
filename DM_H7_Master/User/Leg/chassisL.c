@@ -221,23 +221,23 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
 
 void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 { 
-    // // 离地状态
-    // if (fabs(left->LQR.Fn) <= 5.0f)
-    // {
-    //   left->status.offGround = 1;
-    //   memcpy(left->LQR.K, ChassisL_LQR_K_fall, sizeof(float) * 12);
-    // } else {
-    //   left->status.offGround = 0;
-    //   memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
-    // }
-    // if (fabs(right->LQR.Fn) <= 5.0f)
-    // {
-    //   right->status.offGround = 1;
-    //   memcpy(right->LQR.K, ChassisR_LQR_K_fall, sizeof(float) * 12);
-    // } else {
-    //   right->status.offGround = 0;
-    //   memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
-    // }
+    // 离地状态
+    if (fabs(left->LQR.Fn) <= 10.0f)
+    {
+      left->status.offGround = 1;
+      // memcpy(left->LQR.K, ChassisL_LQR_K_fall, sizeof(float) * 12);
+    } else {
+      left->status.offGround = 0;
+      // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
+    }
+    if (fabs(right->LQR.Fn) <= 10.0f)
+    {
+      right->status.offGround = 1;
+      // memcpy(right->LQR.K, ChassisR_LQR_K_fall, sizeof(float) * 12);
+    } else {
+      right->status.offGround = 0;
+      // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
+    }
     // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
     // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
