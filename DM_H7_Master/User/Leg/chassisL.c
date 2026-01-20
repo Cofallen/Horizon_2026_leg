@@ -295,10 +295,10 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
     int machine_state = left->status.stand;
     static uint16_t time = 0;   // 板凳起立时间
 
-    // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
-    // Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
-    memcpy(left->LQR.K , ChassisL_LQR_K, sizeof(ChassisL_LQR_K));
-    memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(ChassisR_LQR_K));
+    Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
+    Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
+    // memcpy(left->LQR.K , ChassisL_LQR_K, sizeof(ChassisL_LQR_K));
+    // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(ChassisR_LQR_K));
 
     if (machine_state == 1) // 倒地
     {

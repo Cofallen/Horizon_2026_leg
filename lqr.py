@@ -148,7 +148,7 @@ def send_k(COM):
 
 # 拟合k矩阵 0.08-0.17 步长0.005
 def fit_k():
-    leg_lengths = np.arange(0.08, 0.18, 0.005)
+    leg_lengths = np.arange(0.12, 0.36, 0.005)
     k_values = []
     for ll in leg_lengths:
         print('solve: ',float(ll))
@@ -191,12 +191,12 @@ def fit_k():
     return (a11, a12, a13, a14, a15, a16, a21, a22, a23, a24, a25, a26)
     
 if __name__ == "__main__":
-    data = get_k(0.22)
-    if data is not None:
-        # 将矩阵展平为一维数组
-        flat_data = np.array(data).flatten()
-        # 格式化为 C 语言数组字符串，保留8位小数
-        c_str = ", ".join([f"{x:.8f}" for x in flat_data])
-        print(f"float K[{len(flat_data)}] = {{ {c_str} }};\n")
+    # data = get_k(0.22)
+    # if data is not None:
+    #     # 将矩阵展平为一维数组
+    #     flat_data = np.array(data).flatten()
+    #     # 格式化为 C 语言数组字符串，保留8位小数
+    #     c_str = ", ".join([f"{x:.8f}" for x in flat_data])
+    #     print(f"float K[{len(flat_data)}] = {{ {c_str} }};\n")
     # send_k('COM36')
-    # coeffs = fit_k()
+    coeffs = fit_k()
