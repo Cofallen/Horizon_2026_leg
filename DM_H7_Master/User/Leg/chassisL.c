@@ -16,8 +16,8 @@ float PID_P_LB[3] = {1.0f, 0.0f, 0.0f};
 void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {
     // BM_EnableDisable()
-    ALL_MOTOR.left_front.DATA.pos_init_rad = 0.16f;
-    ALL_MOTOR.left_back.DATA.pos_init_rad  = 3.04f;   // 读取应取负
+    ALL_MOTOR.left_front.DATA.pos_init_rad = 1.2024f;
+    ALL_MOTOR.left_back.DATA.pos_init_rad  = 2.9504f;   // 读取lr都应取负
     ALL_MOTOR.left_wheel.DATA.Angle_Init   = ALL_MOTOR.left_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->left_front.PID_P, 1.0f, 0.1f, PID_P_LF,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
@@ -471,13 +471,13 @@ uint8_t s1[2] = {0};
 
 void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
 {
-  VOFA_justfloat((float)s1[0], (float)s1[1],
-                 (float)state,
-                 left->vmc_calc.L0[POS],
-                 right->vmc_calc.L0[POS],
-                left->target.l0,
-                right->target.l0,
-                0,0,0);
+  // VOFA_justfloat((float)s1[0], (float)s1[1],
+  //                (float)state,
+  //                left->vmc_calc.L0[POS],
+  //                right->vmc_calc.L0[POS],
+  //               left->target.l0,
+  //               right->target.l0,
+  //               0,0,0);
   s1[0] = dbus->Remote.S1_u8;
   if (s1[0] == 2 && s1[1] == 3)
   {
@@ -505,21 +505,27 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
 
   case flight:
     left->target.l0 += 0.0012f;
-    right->target.l0 += 0.0012;
+    right->target.l0 += 0.0012f;
     // left->pid.F0_l.max_out = 80.0f;
     // right->pid.F0_l.max_out = 80.0f;
-    if (left->vmc_calc.L0[POS] >= 0.32f && right->vmc_calc.L0[POS] >= 0.32f)
+    if (left->vmc_calc.L0[POS] >= 0.28f && right->vmc_calc.L0[POS] >= 0.28f)
     {
       state = retract;
     }
     break;
 
   case retract:
-    left->target.l0 -= 0.0012f;
-    right->target.l0 -= 0.0012f;
+    // left->target.l0 -= 0.0012f;
+    // right->target.l0 -= 0.0012f;
+    left->target.l0 = 0.10f;
+    right->target.l0 = 0.10f;
+    left->pid.F0_l.Kp = 4000.0f;
+    right->pid.F0_l.Kp = 4000.0f;
+    left->pid.F0_l.max_out = 130.0f;
+    right->pid.F0_l.max_out = 130.0f;
     // left->pid.F0_l.max_out = 30.0f;
     // right->pid.F0_l.max_out = 30.0f;
-    if (left->vmc_calc.L0[POS] <= 0.18f && right->vmc_calc.L0[POS] <= 0.18f)
+    if (left->vmc_calc.L0[POS] <= 0.16f && right->vmc_calc.L0[POS] <= 0.16f)
     {
       state = extend;
     }
@@ -528,9 +534,16 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
   case extend:
     left->target.l0 += 0.0008f;
     right->target.l0 += 0.0008f;
-    if (left->vmc_calc.L0[POS] >= 0.22f && right->vmc_calc.L0[POS] >= 0.22f)
+    // left->target.l0 = 0.2f;
+    // right->target.l0 = 0.2f;      
+    
+    if (left->vmc_calc.L0[POS] >= 0.2f && right->vmc_calc.L0[POS] >= 0.2f)
     {
       state = idle;
+      left->pid.F0_l.Kp = 2000.0f;
+      right->pid.F0_l.Kp = 2000.0f;
+      left->pid.F0_l.max_out = 80.0f;
+      right->pid.F0_l.max_out = 80.0f;
     }
     break;
 

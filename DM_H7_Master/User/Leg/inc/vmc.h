@@ -8,7 +8,7 @@
 #include "Motors.h"
 #include "IMU_Task.h"
 
-#define BANDENG_LENGTH 0.14f
+#define BANDENG_LENGTH 0.16f
 
 #define RADIUS_WHEEL   0.06f
 #define MASS_WHEEL     0.572f         // +-   屁股0.117，加到轮上
@@ -25,8 +25,8 @@
 
 #define MAX_TORQUE_LEG_T 20.0f
 #define MAX_TORQUE_LEG_W 3.0f
-#define MAX_LEG_LENGTH 0.36f
-#define MIN_LEG_LENGTH 0.12f
+#define MAX_LEG_LENGTH 0.35f
+#define MIN_LEG_LENGTH 0.14f
 
 #define REDUCTION_RATIO 15.764705882352941176470588235294f   // 268/17
 // #define TORQUE_RATE 0.06894876031507928693743672227522f      // 含减速箱0.92

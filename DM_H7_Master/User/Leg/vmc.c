@@ -24,12 +24,12 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     // const float F0_control[3] = {8000.0f, 0.0f, 30000.0f};  // 下落状态切换
     const float F0_control[3] = {2000.0f, 1.0f, 20000.0f};
     const float Yaw_control[3] = {1.0f, 0.0f, 600.0f};
-    const float Delta_control[3] = {20.0f, 0.1f, 50.0f};
+    const float Delta_control[3] = {40.0f, 0.1f, 50.0f};
     const float Roll_control[3] = {1000.0f, 0.0f, 30.0f};
 
     PID_init(&object->pid.F0_l, PID_POSITION, F0_control, 80.0f, 0.0f);
     PID_init(&object->pid.Yaw, PID_POSITION, Yaw_control, 1.0f, 0.0f);
-    PID_init(&object->pid.Delta, PID_POSITION, Delta_control, 1.5f, 0.2f);
+    PID_init(&object->pid.Delta, PID_POSITION, Delta_control, 10.0f, 0.2f);
     PID_init(&object->pid.Roll, PID_POSITION, Roll_control, 15.0f, 0.0f);
 }
 
