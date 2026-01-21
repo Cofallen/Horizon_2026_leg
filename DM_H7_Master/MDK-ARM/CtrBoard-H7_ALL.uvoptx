@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>66</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134232384</Address>
+          <Address>134233768</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -175,7 +175,7 @@
           <Type>0</Type>
           <LineNumber>68</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134232400</Address>
+          <Address>134233784</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -226,7 +226,7 @@
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Leg_l</ItemText>
+          <ItemText>Leg_l,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>8</count>

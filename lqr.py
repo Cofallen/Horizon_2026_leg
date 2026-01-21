@@ -120,8 +120,8 @@ def get_k(leg_length):
     B_num = np.array(B_sym.subs(eq_point)).astype(np.float64)
 
     # 8. LQR 求解
-    Q = np.diag([1500, 1, 500, 10, 6000, 1])
-    R_mat = np.diag([30, 10]) 
+    Q = np.diag([1500, 1, 800, 10, 8000, 1])
+    R_mat = np.diag([50, 10]) 
     try:
         P_sol = scipy.linalg.solve_continuous_are(A_num, B_num, Q, R_mat)
         K = np.linalg.inv(R_mat) @ B_num.T @ P_sol
@@ -191,7 +191,7 @@ def fit_k():
     return (a11, a12, a13, a14, a15, a16, a21, a22, a23, a24, a25, a26)
     
 if __name__ == "__main__":
-    # data = get_k(0.22)
+    # data = get_k(0.15)
     # if data is not None:
     #     # 将矩阵展平为一维数组
     #     flat_data = np.array(data).flatten()

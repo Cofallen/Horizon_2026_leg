@@ -106,8 +106,9 @@ void StartGimbalTask(void const *argument)
         ChassisL_UpdateState(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // Chassis_GetStatus(&Leg_l, &Leg_r);
+        Chassis_GetStatus(&Leg_l, &Leg_r);
         Chassis_StateHandle(&Leg_l, &Leg_r);
+        Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
         ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
@@ -154,13 +155,29 @@ void StartK3debugTask(void const * argument)
     {
 //		k3debug_task(&ALL_MOTOR, &WHW_V_DBUS);
 //        DM_test(&IMU_Data);
-        VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
-                       ALL_MOTOR.left_back.DATA.voltage,
-                         ALL_MOTOR.right_front.DATA.voltage,
-                        ALL_MOTOR.right_back.DATA.voltage,
-                        0,0,
-                        (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
-                        Leg_l.LQR.Fn,Leg_r.LQR.Fn );
+        // VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
+        //                ALL_MOTOR.left_back.DATA.voltage,
+        //                  ALL_MOTOR.right_front.DATA.voltage,
+        //                 ALL_MOTOR.right_back.DATA.voltage,
+        //                 0,Leg_l.LQR.K[0],
+        //                 (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
+        //                 Leg_l.LQR.Fn,Leg_r.LQR.Fn );
+        // VOFA_justfloat((float)Leg_l.status.stand,
+        //                 (float)Leg_l.stateSpace.theta,
+        //                 (float)Leg_r.status.stand,
+        //                 (float)Leg_r.stateSpace.theta,
+        //                 Leg_l.LQR.Fn,
+        //                 Leg_l.LQR.Fn,0,0,0,0);
+        VOFA_justfloat(Leg_l.pid.F0_l.error[0],
+                        Leg_l.pid.F0_l.out,
+                        Leg_l.pid.F0_l.Pout,
+                        Leg_l.pid.F0_l.Iout,
+                        Leg_l.pid.F0_l.Dout,
+                        Leg_r.pid.F0_l.error[0],
+                        Leg_r.pid.F0_l.out,
+                        Leg_r.pid.F0_l.Pout,
+                        Leg_r.pid.F0_l.Iout,
+                        Leg_r.pid.F0_l.Dout);    
         vTaskDelayUntil(&currentTimeK3debug, 1);
     }
 }
