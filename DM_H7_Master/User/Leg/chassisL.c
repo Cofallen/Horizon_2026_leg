@@ -529,12 +529,15 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     // right->target.l0 -= 0.0008f;
     left->target.l0 = 0.10f;
     right->target.l0 = 0.10f;
-
+    left->limit.W_max = 0.0f;
+    right->limit.W_max = 0.0f;
     // left->pid.F0_l.max_out = 30.0f;
     // right->pid.F0_l.max_out = 30.0f;
     if (left->vmc_calc.L0[POS] <= 0.14f && right->vmc_calc.L0[POS] <= 0.14f)
     {
       state = idle;
+      left->limit.W_max = 6.0f;
+      right->limit.W_max = 6.0f;
       left->pid.F0_l.Kp = 5000.0f;
       right->pid.F0_l.Kp = 5000.0f;
       left->pid.F0_l.Kd = 30000.0f;
