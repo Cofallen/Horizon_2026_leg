@@ -7,6 +7,7 @@
 #include "arm_math.h"
 #include "Motors.h"
 #include "IMU_Task.h"
+#include "controller.h"
 
 #define BANDENG_LENGTH 0.16f
 
@@ -93,6 +94,7 @@ typedef struct
     struct 
     {
         pid_type_def F0_l;
+        PID_t F0_l_x;
         pid_type_def Yaw;
         pid_type_def Delta;             // 防劈叉
         pid_type_def Roll;              // roll 补偿

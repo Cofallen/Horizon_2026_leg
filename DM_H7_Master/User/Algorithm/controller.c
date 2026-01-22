@@ -252,7 +252,8 @@ float PID_Calculate(PID_t *pid, float measure, float ref)
         f_PID_ErrorHandle(pid);
 
     uint32_t tmp = pid->DWT_CNT;
-    pid->dt = DWT_GetDeltaT(&tmp);
+    // pid->dt = DWT_GetDeltaT(&tmp);
+    pid->dt = 1;
 
     pid->Measure = measure;
     pid->Ref = ref;

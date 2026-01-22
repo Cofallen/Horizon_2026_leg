@@ -78,6 +78,7 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
                       object->LQR.K[10] * (object->stateSpace.phi - object->target.phi) +
                       object->LQR.K[11] * (object->stateSpace.dphi - object->target.dphi));
 
+    // PID_Calculate(&object->pid.F0_l_x, object->vmc_calc.L0[POS], object->target.l0);
     PID_calc(&object->pid.F0_l, object->vmc_calc.L0[POS], object->target.l0);
     object->LQR.dF_0 = object->pid.F0_l.out;
 
@@ -90,7 +91,10 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     PID_calc(&object->pid.Yaw, imu->YawTotalAngle / 57.3f, object->target.yaw);
     object->LQR.dF_yaw = object->pid.Yaw.out;
 
-    object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 - object->LQR.dF_roll);
+    // if (object->status.jump == 3 || object->status.jump == 4)
+    //   object->LQR.F_0 = object->LQR.dF_0 + object->LQR.dF_roll; 
+    // else 
+      object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 + object->LQR.dF_roll);
     // object->LQR.F_0 = object->LQR.dF_0 - object->LQR.dF_roll;
 
     // pid修正

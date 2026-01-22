@@ -138,7 +138,6 @@ float ChassisR_LQR_K_coeffs[12][4] = {
 };
 
 
-
 // 拟合K矩阵
 void Chassis_Fit_K(float coeffs[][4], float leg_length, float *LQR_K)
 {

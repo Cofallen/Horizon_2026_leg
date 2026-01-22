@@ -110,6 +110,7 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
                       object->LQR.K[11] * (object->stateSpace.dphi - object->target.dphi));
 
     PID_calc(&object->pid.F0_l, object->vmc_calc.L0[POS], object->target.l0);
+    // PID_Calculate(&object->pid.F0_l_x, object->vmc_calc.L0[POS], object->target.l0);
     object->LQR.dF_0 = object->pid.F0_l.out;
 
     PID_calc(&object->pid.Roll, imu->roll / 57.3f, object->target.roll);
@@ -121,7 +122,10 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     PID_calc(&object->pid.Yaw, imu->YawTotalAngle / 57.3f, object->target.yaw);
     object->LQR.dF_yaw = object->pid.Yaw.out;
     // object->LQR.F_0 = -(object->LQR.dF_0 - object->LQR.dF_roll);
-    object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 + object->LQR.dF_roll);
+    // if (object->status.jump == 3 || object->status.jump == 4)
+    //   object->LQR.F_0 = object->LQR.dF_0 + object->LQR.dF_roll; 
+    // else 
+      object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 + object->LQR.dF_roll);
     // object->LQR.F_0 = 0;
     // pid修正
     object->LQR.T_p = object->LQR.T_p + object->LQR.dF_delta;
@@ -495,8 +499,8 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     break;
   
   case compact:
-    left->target.l0 -= 0.001f;
-    right->target.l0 -= 0.001f;
+    left->target.l0 -= 0.0002f;
+    right->target.l0 -= 0.0002f;
     if (left->vmc_calc.L0[POS] <= 0.16f && right->vmc_calc.L0[POS] <= 0.16f)
     {
       state = flight;
@@ -506,6 +510,10 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
   case flight:
     left->target.l0 += 0.0012f;
     right->target.l0 += 0.0012f;
+    left->pid.F0_l.Kp = 700.0f;
+    right->pid.F0_l.Kp = 700.0f;
+    left->pid.F0_l.max_out = 100.0f;    // 160太大，欠压16
+    right->pid.F0_l.max_out = 100.0f;
     // left->pid.F0_l.max_out = 80.0f;
     // right->pid.F0_l.max_out = 80.0f;
     if (left->vmc_calc.L0[POS] >= 0.28f && right->vmc_calc.L0[POS] >= 0.28f)
@@ -515,40 +523,42 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     break;
 
   case retract:
-    // left->target.l0 -= 0.0012f;
-    // right->target.l0 -= 0.0012f;
+    // left->target.l0 -= 0.0008f;
+    // right->target.l0 -= 0.0008f;
     left->target.l0 = 0.10f;
     right->target.l0 = 0.10f;
-    left->pid.F0_l.Kp = 4000.0f;
-    right->pid.F0_l.Kp = 4000.0f;
-    left->pid.F0_l.max_out = 130.0f;
-    right->pid.F0_l.max_out = 130.0f;
+
     // left->pid.F0_l.max_out = 30.0f;
     // right->pid.F0_l.max_out = 30.0f;
-    if (left->vmc_calc.L0[POS] <= 0.16f && right->vmc_calc.L0[POS] <= 0.16f)
+    if (left->vmc_calc.L0[POS] <= 0.14f && right->vmc_calc.L0[POS] <= 0.14f)
     {
       state = extend;
     }
     break;
 
   case extend:
-    left->target.l0 += 0.0008f;
-    right->target.l0 += 0.0008f;
-    // left->target.l0 = 0.2f;
-    // right->target.l0 = 0.2f;      
-    
-    if (left->vmc_calc.L0[POS] >= 0.2f && right->vmc_calc.L0[POS] >= 0.2f)
-    {
+    // left->target.l0 += 0.0008f;
+    // right->target.l0 += 0.0008f;
+    left->target.l0 = 0.14f;
+    right->target.l0 = 0.14f;      
+    left->pid.F0_l.Kd = 60000.0f;
+    right->pid.F0_l.Kd = 60000.0f;
+    // if (left->vmc_calc.L0[POS] >= 0.16f && right->vmc_calc.L0[POS] >= 0.16f)
+    // {
       state = idle;
-      left->pid.F0_l.Kp = 2000.0f;
-      right->pid.F0_l.Kp = 2000.0f;
+      left->pid.F0_l.Kp = 6000.0f;
+      right->pid.F0_l.Kp = 6000.0f;
+      left->pid.F0_l.Kd = 20000.0f;
+      right->pid.F0_l.Kd = 20000.0f;
       left->pid.F0_l.max_out = 80.0f;
       right->pid.F0_l.max_out = 80.0f;
-    }
+    // }
     break;
 
   default:
     state = idle;
     break;
   }
+  left->status.jump = state;
+  right->status.jump = state;
 }

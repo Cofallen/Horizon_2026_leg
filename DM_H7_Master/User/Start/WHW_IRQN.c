@@ -85,6 +85,7 @@ void StartGimbalTask(void const *argument)
 {
     // BM_EnableDisable(&hfdcan1, 0x01);
     // BM_set_ID(&hfdcan1, 2, 1);
+    osDelay(100);
     BM_EnableDisable(&hfdcan2, 0x02);
     // BM_save_flash(&hfdcan1);
     osDelay(10);
@@ -159,7 +160,7 @@ void StartK3debugTask(void const * argument)
                        ALL_MOTOR.left_back.DATA.voltage,
                          ALL_MOTOR.right_front.DATA.voltage,
                         ALL_MOTOR.right_back.DATA.voltage,
-                        0,Leg_l.pid.F0_l.out,
+                        0,Leg_l.pid.F0_l_x.Output,
                         (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
                         Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         // VOFA_justfloat((float)Leg_l.status.stand,

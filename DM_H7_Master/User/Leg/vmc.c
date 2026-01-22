@@ -22,15 +22,19 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     object->target.d2theta = 0.0f;
 
     // const float F0_control[3] = {8000.0f, 0.0f, 30000.0f};  // 下落状态切换
-    const float F0_control[3] = {2000.0f, 1.0f, 20000.0f};
-    const float Yaw_control[3] = {1.0f, 0.0f, 600.0f};
-    const float Delta_control[3] = {40.0f, 0.1f, 50.0f};
-    const float Roll_control[3] = {1000.0f, 0.0f, 30.0f};
+    const float F0_control[3] = {5000.0f, 1.0f, 30000.0f};
+    const float Yaw_control[3] = {3.0f, 0.0f, 600.0f};
+    const float Delta_control[3] = {300.0f, 0.1f, 300.0f};
+    const float Roll_control[3] = {1000.0f, 0.0f, 300.0f};
 
     PID_init(&object->pid.F0_l, PID_POSITION, F0_control, 80.0f, 0.0f);
-    PID_init(&object->pid.Yaw, PID_POSITION, Yaw_control, 1.0f, 0.0f);
+    // PID_Init(&object->pid.F0_l_x, 80.0f, 10.0f, F0_control, 
+    //                     2000.0f, 2000.0f, 0.7f, 0.7f, 
+    //                     0, Integral_Limit|Derivative_On_Measurement|Trapezoid_Intergral|
+    //                         OutputFilter|ChangingIntegrationRate|DerivativeFilter|ErrorHandle);
+    PID_init(&object->pid.Yaw, PID_POSITION, Yaw_control, 2.0f, 0.0f);
     PID_init(&object->pid.Delta, PID_POSITION, Delta_control, 10.0f, 0.2f);
-    PID_init(&object->pid.Roll, PID_POSITION, Roll_control, 15.0f, 0.0f);
+    PID_init(&object->pid.Roll, PID_POSITION, Roll_control, 20.0f, 0.0f);
 }
 
 void Vmc_calcL(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)
@@ -114,8 +118,8 @@ static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu)
 {
     float P = 0.0f, ddz_w = 0.0f;
     static float ddl_fL, ddtheta_fL, acc_fL; 
-    ddl_fL = Lowpass_Filter(&ddl_fL, object->vmc_calc.L0[ACC], 0.1f);
-    acc_fL = Lowpass_Filter(&acc_fL, imu->accel[2], 0.1f);
+    ddl_fL = Lowpass_Filter(&ddl_fL, object->vmc_calc.L0[ACC], 1.0f);
+    acc_fL = Lowpass_Filter(&acc_fL, imu->accel[2], 1.0f);
 
     P = object->LQR.F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fL - 9.81f) - ddl_fL * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
@@ -127,8 +131,8 @@ static float Vmc_getFnR(Leg_Typedef *object, IMU_Data_t *imu)
 {
     float P = 0.0f, ddz_w = 0.0f;
     static float ddl_fR, ddtheta_fR, acc_fR; 
-    ddl_fR = Lowpass_Filter(&ddl_fR, object->vmc_calc.L0[ACC], 0.1f);
-    acc_fR = Lowpass_Filter(&acc_fR, imu->accel[2], 0.1f);
+    ddl_fR = Lowpass_Filter(&ddl_fR, object->vmc_calc.L0[ACC], 1.0f);
+    acc_fR = Lowpass_Filter(&acc_fR, imu->accel[2], 1.0f);
 
     P = object->LQR.F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fR - 9.81f) - ddl_fR * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
