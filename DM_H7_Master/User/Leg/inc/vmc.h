@@ -25,7 +25,7 @@
 #define ACC 2
 
 #define MAX_TORQUE_LEG_T 20.0f
-#define MAX_TORQUE_LEG_W 3.0f
+#define MAX_TORQUE_LEG_W 6.0f
 #define MAX_LEG_LENGTH 0.35f
 #define MIN_LEG_LENGTH 0.14f
 

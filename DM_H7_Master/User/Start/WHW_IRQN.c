@@ -160,7 +160,7 @@ void StartK3debugTask(void const * argument)
                        ALL_MOTOR.left_back.DATA.voltage,
                          ALL_MOTOR.right_front.DATA.voltage,
                         ALL_MOTOR.right_back.DATA.voltage,
-                        0,Leg_l.pid.F0_l_x.Output,
+                        0,Leg_l.pid.F0_l.out,
                         (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
                         Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         // VOFA_justfloat((float)Leg_l.status.stand,

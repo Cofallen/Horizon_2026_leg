@@ -12,8 +12,8 @@ float PID_P_RB[3] = {1.0f, 0.0f, 0.0f};
 
 void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {   
-    ALL_MOTOR.right_front.DATA.pos_init_rad = 0.8795f;
-    ALL_MOTOR.right_back.DATA.pos_init_rad  = 1.5322f;
+    ALL_MOTOR.right_front.DATA.pos_init_rad = -1.2931f;
+    ALL_MOTOR.right_back.DATA.pos_init_rad  = 2.5065f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->right_front.PID_P, 1.5f, 0.1f, PID_P_RF,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
@@ -54,9 +54,9 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
 {   
     // 目标值获取应加上滤波 重写一个函数
     // object->target.theta = (float)dbus->Remote.CH1_int16 / 660.0f * 1.0f;
-    object->target.theta = 0.0f;
+    object->target.theta = 0.08f;
     object->target.dtheta = 0.0f;
-    object->target.dot_s = (float)dbus->Remote.CH1_int16 / 660.0f * 1.5f + (float)(dbus->KeyBoard.W - dbus->KeyBoard.S) * 0.3f;
+    object->target.dot_s = (float)dbus->Remote.CH1_int16 / 660.0f * 2.0f + (float)(dbus->KeyBoard.W - dbus->KeyBoard.S) * 0.3f;
     object->target.s = Discreteness_Sum(&object->Discreteness.target_s, object->target.dot_s, dt);
     object->target.phi = 0.0f;
     object->target.dphi = 0.0f;
