@@ -54,6 +54,7 @@ typedef struct
         float ddtheta;
         float s;
         float dot_s;
+        float raw_dot_s;
         float phi;
         float dphi;
         float ddphi;

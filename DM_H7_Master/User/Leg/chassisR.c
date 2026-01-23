@@ -4,6 +4,7 @@
 #include "All_Init.h"
 #include "vmc.h"
 #include "get_K.h"
+#include "chassisL.h"
 
 float PID_S_RF[3] = {5.0f, 0.0f, 0.0f};
 float PID_P_RF[3] = {1.0f, 0.0f, 0.0f};
@@ -106,7 +107,7 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
                                  object->vmc_calc.JRM[0][1] * object->LQR.T_p;
     object->LQR.torque_setT[1] = object->vmc_calc.JRM[1][0] * object->LQR.F_0 + \
                                  object->vmc_calc.JRM[1][1] * object->LQR.T_p;
-    object->LQR.torque_setW  = object->LQR.T_w;
+    object->LQR.torque_setW  = object->LQR.T_w * kr;
 
     // 限幅
     (object->LQR.torque_setT[0] > object->limit.T_max) ? (object->LQR.torque_setT[0] = object->limit.T_max) : (object->LQR.torque_setT[0] < -object->limit.T_max) ? (object->LQR.torque_setT[0] = -object->limit.T_max) : 0;

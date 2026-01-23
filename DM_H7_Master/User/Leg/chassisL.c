@@ -53,6 +53,8 @@ void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t 
     object->stateSpace.ddtheta = Discreteness_Diff(&object->Discreteness.dTheta, object->stateSpace.dtheta, dt);
 }
 
+float kl = 1.0f, kr = 1.0f;
+int16_t kl_count = 0, kr_count = 0;
 // 用于更新两腿之间的相对状态
 void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef *motor, float dt)
 {
@@ -70,7 +72,9 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
 
     dot_s = dot_s_b + 0.5f * (Leg_l->vmc_calc.L0[POS] * Leg_r->stateSpace.dtheta * arm_cos_f32(Leg_l->stateSpace.theta) + Leg_r->vmc_calc.L0[POS] * Leg_l->stateSpace.dtheta * arm_cos_f32(Leg_r->stateSpace.theta)) \
                       + 0.5f * (Leg_l->vmc_calc.L0[VEL] * arm_sin_f32(Leg_l->stateSpace.theta) + Leg_r->vmc_calc.L0[VEL] * arm_sin_f32(Leg_r->stateSpace.theta));
-
+    Leg_l->stateSpace.raw_dot_s = dot_s;
+    Leg_r->stateSpace.raw_dot_s = dot_s;
+    
     Leg_l->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);
     Leg_r->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);;
     Leg_l->stateSpace.s     = Discreteness_Sum(&Leg_l->Discreteness.dS, Leg_l->stateSpace.dot_s, dt);
@@ -79,10 +83,12 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
     Leg_l->LQR.delta = Leg_r->stateSpace.theta - Leg_l->stateSpace.theta;
     Leg_r->LQR.delta = Leg_r->stateSpace.theta - Leg_l->stateSpace.theta;
 
+    slip_Check(Leg_l, Leg_r);
+    
     VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
                   dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
                   s,
-                  0,0,0,0,0); 
+                  (float)kl,(float)kr,0,0,0); 
 }
 
 
@@ -141,7 +147,7 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
                                  object->vmc_calc.JRM[0][1] * object->LQR.T_p;
     object->LQR.torque_setT[1] = object->vmc_calc.JRM[1][0] * object->LQR.F_0 + \
                                  object->vmc_calc.JRM[1][1] * object->LQR.T_p;
-    object->LQR.torque_setW  = object->LQR.T_w;
+    object->LQR.torque_setW  = object->LQR.T_w * kl;
 
     // 限幅
     (object->LQR.torque_setT[0] > object->limit.T_max) ? (object->LQR.torque_setT[0] = object->limit.T_max) : (object->LQR.torque_setT[0] < -object->limit.T_max) ? (object->LQR.torque_setT[0] = -object->limit.T_max) : 0;
