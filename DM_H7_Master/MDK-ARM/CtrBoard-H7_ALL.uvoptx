@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>66</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233704</Address>
+          <Address>134233912</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -175,7 +175,7 @@
           <Type>0</Type>
           <LineNumber>68</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233720</Address>
+          <Address>134233928</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -232,6 +232,11 @@
           <count>8</count>
           <WinNumber>1</WinNumber>
           <ItemText>Leg_r</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>RUI_V_CONTAL</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

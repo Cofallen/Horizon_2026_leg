@@ -7,6 +7,7 @@
 #include "get_K.h"
 #include "pid_temp.h"
 #include "BM_Motor.h"
+#include "observe.h"
 
 float PID_S_LF[3] = {5.0f, 0.0f, 0.0f};
 float PID_P_LF[3] = {1.0f, 0.0f, 0.0f};
@@ -70,13 +71,18 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
     dot_s = dot_s_b + 0.5f * (Leg_l->vmc_calc.L0[POS] * Leg_r->stateSpace.dtheta * arm_cos_f32(Leg_l->stateSpace.theta) + Leg_r->vmc_calc.L0[POS] * Leg_l->stateSpace.dtheta * arm_cos_f32(Leg_r->stateSpace.theta)) \
                       + 0.5f * (Leg_l->vmc_calc.L0[VEL] * arm_sin_f32(Leg_l->stateSpace.theta) + Leg_r->vmc_calc.L0[VEL] * arm_sin_f32(Leg_r->stateSpace.theta));
 
-    Leg_l->stateSpace.dot_s = dot_s;
-    Leg_r->stateSpace.dot_s = dot_s;
+    Leg_l->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);
+    Leg_r->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);;
     Leg_l->stateSpace.s     = Discreteness_Sum(&Leg_l->Discreteness.dS, Leg_l->stateSpace.dot_s, dt);
     Leg_r->stateSpace.s     = Discreteness_Sum(&Leg_r->Discreteness.dS, Leg_r->stateSpace.dot_s, dt);
 
     Leg_l->LQR.delta = Leg_r->stateSpace.theta - Leg_l->stateSpace.theta;
     Leg_r->LQR.delta = Leg_r->stateSpace.theta - Leg_l->stateSpace.theta;
+
+    VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
+                  dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
+                  s,
+                  0,0,0,0,0); 
 }
 
 
