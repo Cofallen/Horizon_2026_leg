@@ -157,14 +157,14 @@ void StartK3debugTask(void const * argument)
     {
 //		k3debug_task(&ALL_MOTOR, &WHW_V_DBUS);
 //        DM_test(&IMU_Data);
-        // VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
-        //                ALL_MOTOR.left_back.DATA.voltage,
-        //                  ALL_MOTOR.right_front.DATA.voltage,
-        //                 ALL_MOTOR.right_back.DATA.voltage,
-        //                 RUI_V_CONTAL.DWT_TIME.Move_Dtime,
-        //                 Leg_l.pid.F0_l.out,
-        //                 (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
-        //                 Leg_l.LQR.Fn,Leg_r.LQR.Fn );
+        VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
+                       ALL_MOTOR.left_back.DATA.voltage,
+                         ALL_MOTOR.right_front.DATA.voltage,
+                        ALL_MOTOR.right_back.DATA.voltage,
+                        RUI_V_CONTAL.DWT_TIME.Move_Dtime,
+                        Leg_l.pid.F0_l.out,
+                        (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
+                        Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         // VOFA_justfloat((float)Leg_l.status.stand,
         //                 (float)Leg_l.stateSpace.theta,
         //                 (float)Leg_r.status.stand,
@@ -260,13 +260,14 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef * huart, uint16_t Size)
 	{
 		if (Size <= 18)
 		{
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 90); // 接收完毕后重启
+			HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 18); // 接收完毕后重启
 			RUI_F_DUBS_Resovled(DBUS_RX_DATA, &WHW_V_DBUS);
 		}
 		else  // 接收数据长度大于BUFF_SIZE，错误处理
 		{	
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 90); // 接收完毕后重启
-			memset(DBUS_RX_DATA, 0, 18);							   
+			HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 18); // 接收完毕后重启
+			RUI_F_DUBS_Resovled(DBUS_RX_DATA, &WHW_V_DBUS);
+			// memset(DBUS_RX_DATA, 0, 18);							   
 		}
 	}
 	

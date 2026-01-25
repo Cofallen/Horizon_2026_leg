@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>66</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233912</Address>
+          <Address>134233920</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -175,7 +175,7 @@
           <Type>0</Type>
           <LineNumber>68</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134233928</Address>
+          <Address>134233936</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -185,6 +185,22 @@
           <Filename>..\User\Bsp\can_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\CtrBoard_H7_ALL\../User/Bsp/can_bsp.c\68</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>239</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134233354</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Core/Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\CtrBoard_H7_ALL\../Core/Src/main.c\239</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>

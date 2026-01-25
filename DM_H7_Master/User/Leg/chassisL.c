@@ -41,15 +41,19 @@ void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
               Trapezoid_Intergral|ChangingIntegrationRate|
               Derivative_On_Measurement|DerivativeFilter);
 }
-
+float a;
 void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)
 {
     // 更新状态
     object->stateSpace.theta = (PI / 2.0f - object->vmc_calc.phi0[POS] + imu->pitch /  57.3f);
     object->stateSpace.dtheta = Discreteness_Diff(&object->Discreteness.Theta, object->stateSpace.theta, dt);
     object->stateSpace.phi = -imu->pitch / 57.3f;
-    object->stateSpace.dphi = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
+    a = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
+    // object->stateSpace.dphi = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
+    object->stateSpace.dphi = -imu->gyro[0];   
 
+    // VOFA_justfloat(-imu->gyro[0], imu->gyro[1], imu->gyro[2],
+    //                 a,0,0,0,0,0,0);
     object->stateSpace.ddtheta = Discreteness_Diff(&object->Discreteness.dTheta, object->stateSpace.dtheta, dt);
 }
 
@@ -84,11 +88,11 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
     Leg_r->LQR.delta = Leg_r->stateSpace.theta - Leg_l->stateSpace.theta;
 
     slip_Check(Leg_l, Leg_r);
-    
-    VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
-                  dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
-                  s,
-                  (float)kl,(float)kr,0,0,0); 
+
+    // VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
+    //               dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
+    //               s,
+    //               (float)kl,(float)kr,0,0,0); 
 }
 
 
@@ -524,8 +528,8 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     right->target.l0 += 0.0012f;
     // left->target.l0 = 0.4f;
     // right->target.l0 = 0.4f;
-    left->pid.F0_l.Kp = 1000.0f;
-    right->pid.F0_l.Kp = 1000.0f;
+    left->pid.F0_l.Kp = 4000.0f;
+    right->pid.F0_l.Kp = 4000.0f;
     left->pid.F0_l.max_out = 140.0f;    // 160太大，欠压16
     right->pid.F0_l.max_out = 140.0f;
     // left->pid.F0_l.max_out = 80.0f;

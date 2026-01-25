@@ -44,7 +44,8 @@ void ChassisR_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t 
     object->stateSpace.theta = (-PI / 2.0f + object->vmc_calc.phi0[POS] + imu->pitch /  57.3f);
     object->stateSpace.dtheta = Discreteness_Diff(&object->Discreteness.Theta, object->stateSpace.theta, dt);
     object->stateSpace.phi = -imu->pitch / 57.3f;
-    object->stateSpace.dphi = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
+    object->stateSpace.dphi = -imu->gyro[0];  
+    // object->stateSpace.dphi = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
 
     object->stateSpace.ddtheta = Discreteness_Diff(&object->Discreteness.dTheta, object->stateSpace.dtheta, dt);
 }
