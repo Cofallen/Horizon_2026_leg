@@ -400,7 +400,8 @@ void UART5_IRQHandler(void)
   /* USER CODE END UART5_IRQn 0 */
   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 90); // 接收完毕后重
+	// HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 22); // 接收完毕后重
+  // HAL_UARTEx_RxEventCallback(&huart5, 20);
   /* USER CODE END UART5_IRQn 1 */
 }
 

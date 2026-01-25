@@ -67,7 +67,7 @@
  ************************************************************万能分隔符**************************************************************/
 void RUI_F_DUBS_Resovled(uint8_t* Data, DBUS_Typedef *RUI_V_DBUS)
 {
-    RUI_V_DBUS->RUI_V_DBUS_ONLINE_JUDGE_TIME = RUI_DF_DBUS_OFFLINE_TIME;
+    RUI_V_DBUS->ONLINE_JUDGE_TIME = 0;
     DBUS_UNION_Typdef RUI_V_DBUS_UNION;
 
     static uint8_t Key_Q_Lock = 0; // 0是开锁，1是上锁

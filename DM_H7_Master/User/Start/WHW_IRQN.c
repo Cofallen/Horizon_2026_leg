@@ -155,6 +155,13 @@ void StartK3debugTask(void const * argument)
 	
     for(;;)
     {
+        WHW_V_DBUS.ONLINE_JUDGE_TIME++;
+        if (WHW_V_DBUS.ONLINE_JUDGE_TIME >= 300)
+        {
+            memset(&WHW_V_DBUS, 0, sizeof(WHW_V_DBUS));
+            WHW_V_DBUS.Remote.S2_u8 = 1;
+        }
+        
 //		k3debug_task(&ALL_MOTOR, &WHW_V_DBUS);
 //        DM_test(&IMU_Data);
         VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,

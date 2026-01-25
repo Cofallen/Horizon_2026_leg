@@ -94,7 +94,8 @@ typedef struct
     
     struct 
     {
-        pid_type_def F0_l;
+        pid_type_def F0_l_p;
+        pid_type_def F0_l_s;
         PID_t F0_l_x;
         pid_type_def Yaw;
         pid_type_def Delta;             // 防劈叉

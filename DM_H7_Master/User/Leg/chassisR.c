@@ -81,8 +81,9 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
                       object->LQR.K[11] * (object->stateSpace.dphi - object->target.dphi));
 
     // PID_Calculate(&object->pid.F0_l_x, object->vmc_calc.L0[POS], object->target.l0);
-    PID_calc(&object->pid.F0_l, object->vmc_calc.L0[POS], object->target.l0);
-    object->LQR.dF_0 = object->pid.F0_l.out;
+    PID_calc(&object->pid.F0_l_p, object->vmc_calc.L0[POS], object->target.l0);
+    PID_calc(&object->pid.F0_l_s, object->vmc_calc.L0[VEL], object->pid.F0_l_p.out);
+    object->LQR.dF_0 = object->pid.F0_l_s.out;
 
     PID_calc(&object->pid.Roll, imu->roll / 57.3f, object->target.roll);
     object->LQR.dF_roll = object->pid.Roll.out;

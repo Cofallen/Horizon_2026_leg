@@ -65,7 +65,7 @@ ____/\\\\\\\\\_____        __/\\\________/\\\_        __/\\\\\\\\\\\_
 
 typedef struct
 {
-    int8_t ONLINE_JUDGE_TIME; // 在线检测时间
+    uint32_t ONLINE_JUDGE_TIME; // 在线检测时间
     //遥控
     struct
     {
