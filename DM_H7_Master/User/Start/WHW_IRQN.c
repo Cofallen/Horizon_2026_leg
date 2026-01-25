@@ -162,8 +162,8 @@ void StartK3debugTask(void const * argument)
                          ALL_MOTOR.right_front.DATA.voltage,
                         ALL_MOTOR.right_back.DATA.voltage,
                         RUI_V_CONTAL.DWT_TIME.Move_Dtime,
-                        Leg_l.pid.F0_l.out,
-                        (float)Leg_l.status.offGround,(float)Leg_l.status.offGround,
+                        (float)Leg_l.status.stand,
+                        (float)Leg_l.status.stand_count,(float)Leg_l.status.offGround,
                         Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         // VOFA_justfloat((float)Leg_l.status.stand,
         //                 (float)Leg_l.stateSpace.theta,

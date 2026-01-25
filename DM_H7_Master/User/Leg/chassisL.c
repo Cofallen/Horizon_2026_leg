@@ -25,17 +25,17 @@ void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
               Integral_Limit|OutputFilter|ErrorHandle|
               Trapezoid_Intergral|ChangingIntegrationRate|
               Derivative_On_Measurement|DerivativeFilter);
-    PID_Init(&motor->left_front.PID_S, 1.5f, 0.1f, PID_S_LF,
+    PID_Init(&motor->left_front.PID_S, 3.0f, 0.1f, PID_S_LF,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
               Integral_Limit|OutputFilter|ErrorHandle|
               Trapezoid_Intergral|ChangingIntegrationRate|
               Derivative_On_Measurement|DerivativeFilter);
-    PID_Init(&motor->left_back.PID_P, 3.0f, 0.1f, PID_P_LB,
+    PID_Init(&motor->left_back.PID_P, 2.0f, 0.1f, PID_P_LB,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
               Integral_Limit|OutputFilter|ErrorHandle|
               Trapezoid_Intergral|ChangingIntegrationRate|
               Derivative_On_Measurement|DerivativeFilter);
-    PID_Init(&motor->left_back.PID_S, 03.f, 0.1f, PID_S_LB,
+    PID_Init(&motor->left_back.PID_S, 3.0f, 0.1f, PID_S_LB,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
               Integral_Limit|OutputFilter|ErrorHandle|
               Trapezoid_Intergral|ChangingIntegrationRate|
@@ -266,7 +266,7 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     // 倒地自启
     // uint8_t is_fallen = (fabs(left->stateSpace.theta) >= 1.2f) || (fabs(right->stateSpace.theta) >= 1.2f);
     uint8_t is_fallen = (left->vmc_calc.L0[POS] >= 0.2f || right->vmc_calc.L0[POS] >= 0.2f) && (fabs(left->stateSpace.theta) >= 1.2f) || (fabs(right->stateSpace.theta) >= 1.2f);
-    uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.4f) && (fabs(right->stateSpace.theta) < 1.4f) && ((left->stateSpace.theta > 0) && (right->stateSpace.theta > 0));
+    uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f) && ((left->stateSpace.theta > 0) && (right->stateSpace.theta > 0));
     // 使用 left->status.stand 作为整车的状态标志 (0:正常, 1:倒地, 2:恢复)
     switch (left->status.stand)
     {
@@ -295,7 +295,7 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
       // {
         left->status.stand_count++;
         right->status.stand_count++;
-        if (left->status.stand_count >= 1000 || right->status.stand_count >= 1000)
+        if (left->status.stand_count >= 200 || right->status.stand_count >= 200)
         {
           left->status.stand_count = 0;
           right->status.stand_count = 0;
@@ -356,23 +356,23 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
     else if (machine_state == 2) // 恢复
     {
       // 1. 收腿
-      left->target.l0 = 0.16f;
-      right->target.l0 = 0.16f;
-      memcpy(left->LQR.K, ChassisL_LQR_K_stand, sizeof(float) * 12);
-      memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(float) * 12);
+      left->target.l0 = MIN_LEG_LENGTH;
+      right->target.l0 = MIN_LEG_LENGTH;
+      // memcpy(left->LQR.K, ChassisL_LQR_K_stand, sizeof(float) * 12);
+      // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(float) * 12);
       if (fabsf(left->stateSpace.theta) <= 0.3f || fabsf(right->stateSpace.theta ) <= 0.3f)
       {
         // left->limit.T_max = 0.0f;
         // right->limit.T_max = 0.0f;
-        left->limit.W_max = 1.0f;
-        right->limit.W_max = 1.0f;
+        // left->limit.W_max = 1.0f;
+        // right->limit.W_max = 1.0f;
       }
       else
       {
         left->limit.T_max = 2.0f;
         right->limit.T_max = 2.0f;
-        left->limit.W_max = 1.2f;
-        right->limit.W_max = 1.2f;
+        left->limit.W_max = 1.0f;
+        right->limit.W_max = 1.0f;
       }
       time++;
       // 2. 轮电机摆动，髋关节失能
