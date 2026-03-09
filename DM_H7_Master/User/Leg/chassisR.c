@@ -13,8 +13,8 @@ float PID_P_RB[3] = {1.0f, 0.0f, 0.0f};
 
 void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {   
-    ALL_MOTOR.right_front.DATA.pos_init_rad = -1.2931f;
-    ALL_MOTOR.right_back.DATA.pos_init_rad  = 2.5065f;
+    ALL_MOTOR.right_front.DATA.pos_init_rad = -1.7247f;
+    ALL_MOTOR.right_back.DATA.pos_init_rad  = -0.3268f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->right_front.PID_P, 1.5f, 0.1f, PID_P_RF,
               2000.0f, 1000.0f, 0.7f, 0.7f, 2, 

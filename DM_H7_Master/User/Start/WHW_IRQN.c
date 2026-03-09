@@ -92,8 +92,8 @@ void StartGimbalTask(void const *argument)
     osDelay(10);
     ChassisL_Init(&ALL_MOTOR, &Leg_l);
     ChassisR_Init(&ALL_MOTOR, &Leg_r);
-    Vmc_Init(&Leg_l, 0.16);
-    Vmc_Init(&Leg_r, 0.16);
+    Vmc_Init(&Leg_l, 0.18);
+    Vmc_Init(&Leg_r, 0.18);
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
@@ -126,7 +126,7 @@ void StartMonitorTask(void const * argument)
 
     for(;;)
     {
-        // BM_Send_torque(&hfdcan2, 0x032, 0,0,0,0);
+        // BM_Send_torque(&hfdcan2, 0x032, 0.8,0.8,0.8,0.8);
         // BM_Send_torque(&hfdcan2, 0x032, 0, 
         //                     Leg_r.torque_send.T1,
         //                     0,
@@ -137,7 +137,9 @@ void StartMonitorTask(void const * argument)
                             Leg_r.torque_send.T2);
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, Leg_r.torque_send.Tw, 0);
-        DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0);
+        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0);
+        // Leg_l.torque_send.Tw = 0;
+        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
         osDelay(1);

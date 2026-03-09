@@ -9,7 +9,8 @@ KalmanFilter_t vaEstimateKF;
 float KF_F[4] = {1.0f, 0.001f, 0.0f, 1.0f};            // dt应取实际值
 float KF_P[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 float KF_Q[4] = {0.1f, 0.0f, 0.0f, 1.0f};
-float KF_R[4] = {20000.0f, 0.0f, 0.0f, 200000.0f};      // 噪声
+// float KF_R[4] = {20000.0f, 0.0f, 0.0f, 200000.0f};      // 噪声
+float KF_R[4] = {1000.0f, 0.0f, 0.0f, 20000000.0f};      // 噪声
 float KF_K[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 float KF_H[4] = {1.0f, 0.0f, 0.0f, 1.0f};
 

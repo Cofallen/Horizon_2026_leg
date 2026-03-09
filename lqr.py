@@ -120,7 +120,7 @@ def get_k(leg_length):
     B_num = np.array(B_sym.subs(eq_point)).astype(np.float64)
 
     # 8. LQR 求解
-    Q = np.diag([12000, 50, 800, 10, 40000, 50])
+    Q = np.diag([3000, 5, 1000, 10, 6000, 5])
     R_mat = np.diag([40, 5]) 
     try:
         P_sol = scipy.linalg.solve_continuous_are(A_num, B_num, Q, R_mat)
