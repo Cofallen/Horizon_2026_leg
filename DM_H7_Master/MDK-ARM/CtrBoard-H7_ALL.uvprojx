@@ -1704,6 +1704,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Leg\vmc.c</FilePath>
             </File>
+            <File>
+              <FileName>board2board.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\board2board.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

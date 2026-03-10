@@ -8,6 +8,7 @@
 #include "pid_temp.h"
 #include "BM_Motor.h"
 #include "observe.h"
+#include "board2board.h"
 
 float PID_S_LF[3] = {5.0f, 0.0f, 0.0f};
 float PID_P_LF[3] = {1.0f, 0.0f, 0.0f};
@@ -107,6 +108,7 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     // object->target.phi = 0.0f;
     // object->target.dphi = 0.0f;
     object->target.yaw -= ((float)dbus->Remote.CH2_int16 / 660000.0f * 4.0f - (float)(dbus->KeyBoard.A - dbus->KeyBoard.D) * 0.005f + (float)(dbus->Mouse.X_Flt * 0.002f));
+    // object->target.yaw -= imu->YawTotalAngle - boardRxData.dataNeaten.yaw_imu;
     object->target.l0 += ((float)dbus->Remote.CH3_int16 / 660000.0f + (float)(dbus->KeyBoard.Q - dbus->KeyBoard.E) * 0.0001f);
     (object->target.l0 > MAX_LEG_LENGTH) ? (object->target.l0 = MAX_LEG_LENGTH) : (object->target.l0 < MIN_LEG_LENGTH) ? (object->target.l0 = MIN_LEG_LENGTH) : 0;
 

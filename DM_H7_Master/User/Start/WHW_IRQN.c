@@ -51,6 +51,7 @@
 #include "get_K.h"
 #include "BM_motor.h"
 #include "observe.h"
+#include "board2board.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -126,7 +127,7 @@ void StartMonitorTask(void const * argument)
 
     for(;;)
     {
-        // BM_Send_torque(&hfdcan2, 0x032, 0.8,0.8,0.8,0.8);
+        // BM_Send_torque(&hfdcan2, 0x032, 0,0,0,0);
         // BM_Send_torque(&hfdcan2, 0x032, 0, 
         //                     Leg_r.torque_send.T1,
         //                     0,
@@ -136,9 +137,8 @@ void StartMonitorTask(void const * argument)
                             Leg_l.torque_send.T2,
                             Leg_r.torque_send.T2);
         osDelay(1);
-        // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, Leg_r.torque_send.Tw, 0);
-        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0);
-        // Leg_l.torque_send.Tw = 0;
+        // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
+
         DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
@@ -174,6 +174,7 @@ void StartK3debugTask(void const * argument)
                         (float)Leg_l.status.stand,
                         (float)Leg_l.status.stand_count,(float)Leg_l.status.offGround,
                         Leg_l.LQR.Fn,Leg_r.LQR.Fn );
+        // canx_send_data(&hfdcan3, 0x200, )
         // VOFA_justfloat((float)Leg_l.status.stand,
         //                 (float)Leg_l.stateSpace.theta,
         //                 (float)Leg_r.status.stand,
@@ -190,8 +191,11 @@ void StartK3debugTask(void const * argument)
         //                 Leg_r.pid.F0_l.Pout,
         //                 Leg_r.pid.F0_l.Iout,
         //                 Leg_r.pid.F0_l.Dout);   
-
-        vTaskDelayUntil(&currentTimeK3debug, 1);
+        Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
+                                          WHW_V_DBUS.Remote.CH3_int16,
+                                          WHW_V_DBUS.Remote.S1_u8,
+                                          WHW_V_DBUS.Remote.S2_u8);
+        osDelay(2);
     }
 }
 
@@ -226,6 +230,12 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
             /* Retrieve Rx messages from RX FIFO0 */
             memset(g_Can3RxData, 0, sizeof(g_Can3RxData));
             HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader3, g_Can3RxData);
+            switch(RxHeader3.Identifier)
+            {
+                case 0x10C:
+                    Board_to_board_recv(&boardRxData, g_Can3RxData);
+                    break;
+            }
         }
     }
 }

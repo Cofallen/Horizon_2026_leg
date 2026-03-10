@@ -213,6 +213,7 @@ virtualFolder:
         - path: ../User/Leg/mymath.c
         - path: ../User/Leg/observe.c
         - path: ../User/Leg/vmc.c
+        - path: ../User/Leg/board2board.c
       folders: []
 dependenceList: []
 outDir: build
@@ -269,6 +270,7 @@ targets:
           afterBuildTasks: []
           asm-compiler:
             $use: asm-auto
+            defines: []
             misc-controls: ""
           beforeBuildTasks: []
           c/cpp-compiler:
@@ -276,7 +278,7 @@ targets:
             language-cpp: c++11
             link-time-optimization: false
             one-elf-section-per-function: true
-            optimization: level-1
+            optimization: level-0
             short-enums#wchar: true
             warnings: ac5-like-warnings
           global:
