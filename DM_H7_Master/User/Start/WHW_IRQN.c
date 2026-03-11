@@ -166,14 +166,14 @@ void StartK3debugTask(void const * argument)
         
 //		k3debug_task(&ALL_MOTOR, &WHW_V_DBUS);
 //        DM_test(&IMU_Data);
-        VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
-                       ALL_MOTOR.left_back.DATA.voltage,
-                         ALL_MOTOR.right_front.DATA.voltage,
-                        ALL_MOTOR.right_back.DATA.voltage,
-                        RUI_V_CONTAL.DWT_TIME.Move_Dtime,
-                        (float)Leg_l.status.stand,
-                        (float)Leg_l.status.stand_count,(float)Leg_l.status.offGround,
-                        Leg_l.LQR.Fn,Leg_r.LQR.Fn );
+        // VOFA_justfloat(ALL_MOTOR.left_front.DATA.voltage,
+        //                ALL_MOTOR.left_back.DATA.voltage,
+        //                  ALL_MOTOR.right_front.DATA.voltage,
+        //                 ALL_MOTOR.right_back.DATA.voltage,
+        //                 RUI_V_CONTAL.DWT_TIME.Move_Dtime,
+        //                 (float)Leg_l.status.stand,
+        //                 (float)Leg_l.status.stand_count,(float)Leg_l.status.offGround,
+        //                 Leg_l.LQR.Fn,Leg_r.LQR.Fn );
         // canx_send_data(&hfdcan3, 0x200, )
         // VOFA_justfloat((float)Leg_l.status.stand,
         //                 (float)Leg_l.stateSpace.theta,
@@ -195,6 +195,10 @@ void StartK3debugTask(void const * argument)
                                           WHW_V_DBUS.Remote.CH3_int16,
                                           WHW_V_DBUS.Remote.S1_u8,
                                           WHW_V_DBUS.Remote.S2_u8);
+        // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
+        //                 IMU_Data.yaw,
+        //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
+        //                 0,0,0,0,0,0,0);
         osDelay(2);
     }
 }
@@ -232,7 +236,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
             HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader3, g_Can3RxData);
             switch(RxHeader3.Identifier)
             {
-                case 0x10C:
+                case 0x1FC:
                     Board_to_board_recv(&boardRxData, g_Can3RxData);
                     break;
             }

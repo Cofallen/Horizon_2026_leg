@@ -135,7 +135,7 @@ void FDCAN3_Config(void)
 
 uint8_t canx_send_data(FDCAN_HandleTypeDef *hcan, uint16_t id, uint8_t *data, uint32_t len)
 {
-    FDCAN_TxHeaderTypeDef TxHeader;
+    FDCAN_TxHeaderTypeDef TxHeader = {0};
 
     TxHeader.Identifier = id;                 // CAN ID
     TxHeader.IdType =  FDCAN_STANDARD_ID ;

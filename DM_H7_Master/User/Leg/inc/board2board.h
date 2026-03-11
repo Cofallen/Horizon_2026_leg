@@ -5,12 +5,12 @@
 
 typedef union 
 {
-    struct 
+    struct __packed
     {
-        int16_t ch2: 11;
-        int16_t ch3: 11;
-        uint8_t s1:  2;
-        uint8_t s2:  2;
+        int16_t ch2;
+        int16_t ch3;
+        uint8_t s1;
+        uint8_t s2;
     } dataNeaten;
     uint8_t sendData[8];
 }boardTxData_t;

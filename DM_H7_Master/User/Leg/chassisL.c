@@ -15,6 +15,10 @@ float PID_P_LF[3] = {1.0f, 0.0f, 0.0f};
 float PID_S_LB[3] = {5.0f, 0.0f, 0.0f};
 float PID_P_LB[3] = {1.0f, 0.0f, 0.0f};
 
+const float PID_Follow_param[3] = {0.1f, 0.0f, 0.0f};
+pid_type_def pid_follow = {0};
+float outppp = 0;
+
 void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {
     // BM_EnableDisable()
@@ -41,6 +45,8 @@ void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
               Integral_Limit|OutputFilter|ErrorHandle|
               Trapezoid_Intergral|ChangingIntegrationRate|
               Derivative_On_Measurement|DerivativeFilter);
+    PID_init(&pid_follow, 0, PID_Follow_param, 2.0f, 0);
+
 }
 float a;
 void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)
@@ -105,13 +111,20 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->target.dtheta = 0.0f;
     object->target.dot_s = (float)dbus->Remote.CH1_int16 / 660.0f * 2.0f + (float)(dbus->KeyBoard.W - dbus->KeyBoard.S) * 0.3f;
     object->target.s = Discreteness_Sum(&object->Discreteness.target_s, object->target.dot_s, dt);
-    // object->target.phi = 0.0f;
-    // object->target.dphi = 0.0f;
+    object->target.phi = 0.0f;
+    object->target.dphi = 0.0f;
     object->target.yaw -= ((float)dbus->Remote.CH2_int16 / 660000.0f * 4.0f - (float)(dbus->KeyBoard.A - dbus->KeyBoard.D) * 0.005f + (float)(dbus->Mouse.X_Flt * 0.002f));
-    // object->target.yaw -= imu->YawTotalAngle - boardRxData.dataNeaten.yaw_imu;
+    outppp = 0;
+    outppp = (boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw);
+    // object->target.yaw = -((float)dbus->Remote.CH2_int16 / 660.0f * 2.0f) ;
+    // object->target.yaw = -((float)dbus->Remote.CH2_int16 / 660.0f * 4.0f) + PID_calc(&pid_follow, outppp, 0.0f);
     object->target.l0 += ((float)dbus->Remote.CH3_int16 / 660000.0f + (float)(dbus->KeyBoard.Q - dbus->KeyBoard.E) * 0.0001f);
     (object->target.l0 > MAX_LEG_LENGTH) ? (object->target.l0 = MAX_LEG_LENGTH) : (object->target.l0 < MIN_LEG_LENGTH) ? (object->target.l0 = MIN_LEG_LENGTH) : 0;
 
+    VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
+                        IMU_Data.yaw,
+                        (float)outppp,
+                        0,0,0,0,0,0,0);
 
     object->LQR.T_w = (object->LQR.K[0] * (object->stateSpace.theta - object->target.theta) +
                      object->LQR.K[1] * (object->stateSpace.dtheta - object->target.dtheta) +

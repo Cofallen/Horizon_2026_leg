@@ -4,7 +4,8 @@
 #include "vmc.h"
 #include "RUI_DBUS.h"
 
-extern float kl, kr;
+extern float kl, kr, outppp;
+extern pid_type_def pid_follow;
 
 void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object);
 void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt);

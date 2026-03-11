@@ -5,6 +5,7 @@
 #include "vmc.h"
 #include "get_K.h"
 #include "chassisL.h"
+#include "board2board.h"
 
 float PID_S_RF[3] = {5.0f, 0.0f, 0.0f};
 float PID_P_RF[3] = {1.0f, 0.0f, 0.0f};
@@ -63,7 +64,9 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->target.phi = 0.0f;
     object->target.dphi = 0.0f;
     object->target.yaw -= ((float)dbus->Remote.CH2_int16 / 660000.0f * 4.0f - (float)(dbus->KeyBoard.A - dbus->KeyBoard.D) * 0.005f + (float)(dbus->Mouse.X_Flt * 0.002f));
-    object->target.l0 += ((float)dbus->Remote.CH3_int16 / 660000.0f + (float)(dbus->KeyBoard.Q - dbus->KeyBoard.E) * 0.0001f); 
+    // object->target.yaw = -((float)dbus->Remote.CH2_int16 / 660.0f * 2.0f) ;
+    // object->target.yaw = -((float)dbus->Remote.CH2_int16 / 660.0f * 4.0f) + PID_calc(&pid_follow, outppp, 0.0f);
+    object->target.l0 +=  ((float)dbus->Remote.CH3_int16 / 660000.0f + (float)(dbus->KeyBoard.Q - dbus->KeyBoard.E) * 0.0001f); 
     (object->target.l0 > MAX_LEG_LENGTH) ? (object->target.l0 = MAX_LEG_LENGTH) : (object->target.l0 < MIN_LEG_LENGTH) ? (object->target.l0 = MIN_LEG_LENGTH) : 0;
 
     object->LQR.T_w = (object->LQR.K[0] * (object->stateSpace.theta - object->target.theta) +
