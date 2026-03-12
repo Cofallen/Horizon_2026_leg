@@ -1709,6 +1709,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Leg\board2board.c</FilePath>
             </File>
+            <File>
+              <FileName>get_target.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\get_target.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

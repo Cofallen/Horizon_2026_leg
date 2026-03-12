@@ -214,6 +214,7 @@ virtualFolder:
         - path: ../User/Leg/observe.c
         - path: ../User/Leg/vmc.c
         - path: ../User/Leg/board2board.c
+        - path: ../User/Leg/get_target.c
       folders: []
 dependenceList: []
 outDir: build

@@ -14,7 +14,7 @@ void Board_to_board_send(boardTxData_t* send, int16_t ch2, int16_t ch3, uint8_t 
     send->dataNeaten.s1 = s1;
     send->dataNeaten.s2 = s2;
     // canx_send_data(&hfdcan3, 0x1A, send->sendData, sizeof(send->sendData));
-    canx_send_data(&hfdcan3, 0x1FF, send->sendData, sizeof(send->sendData));
+    canx_send_data(&hfdcan3, 0x1A, send->sendData, sizeof(send->sendData));
     // canx_send_data(&hfdcan3, 0x200, send->sendData, sizeof(send->sendData));
 }
 

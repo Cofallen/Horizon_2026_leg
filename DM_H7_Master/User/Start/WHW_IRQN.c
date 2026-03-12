@@ -236,7 +236,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
             HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader3, g_Can3RxData);
             switch(RxHeader3.Identifier)
             {
-                case 0x1FC:
+                case 0x1C:
                     Board_to_board_recv(&boardRxData, g_Can3RxData);
                     break;
             }
