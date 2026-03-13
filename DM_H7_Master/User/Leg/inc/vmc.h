@@ -13,7 +13,7 @@
 
 #define RADIUS_WHEEL   0.06f
 #define MASS_WHEEL     0.572f         // +-   屁股0.117，加到轮上
-#define MASS_BODY     10.0f          // +-0.1
+#define MASS_BODY     18.0f          // +-0.1
 #define L1_LENGTH     0.215f
 #define L2_LENGTH     0.258f
 #define L3_LENGTH     0.258f
