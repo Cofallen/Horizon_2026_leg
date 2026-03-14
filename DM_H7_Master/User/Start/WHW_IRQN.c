@@ -111,7 +111,7 @@ void StartGimbalTask(void const *argument)
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetStatus(&Leg_l, &Leg_r);
         Chassis_StateHandle(&Leg_l, &Leg_r);
-        Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
+        // Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
         ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
@@ -194,7 +194,8 @@ void StartK3debugTask(void const * argument)
         Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
                                           WHW_V_DBUS.Remote.CH3_int16,
                                           WHW_V_DBUS.Remote.S1_u8,
-                                          WHW_V_DBUS.Remote.S2_u8);
+                                          WHW_V_DBUS.Remote.S2_u8,
+                                          IMU_Data.pitch);
         // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
         //                 IMU_Data.yaw,
         //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),

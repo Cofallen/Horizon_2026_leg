@@ -11,6 +11,7 @@ typedef union
         int16_t ch3;
         uint8_t s1;
         uint8_t s2;
+        int16_t pitch;
     } dataNeaten;
     uint8_t sendData[8];
 }boardTxData_t;
@@ -23,8 +24,7 @@ typedef union
     } dataNeaten;
     uint8_t rxData[8];
 }boardRxData_t;
-
-void Board_to_board_send(boardTxData_t* send, int16_t ch2, int16_t ch3, uint8_t s1, uint8_t s2 );
+void Board_to_board_send(boardTxData_t* send, int16_t ch2, int16_t ch3, uint8_t s1, uint8_t s2, float pitch );
 void Board_to_board_recv(boardRxData_t* recv, uint8_t *data);
 
 extern boardRxData_t boardRxData;

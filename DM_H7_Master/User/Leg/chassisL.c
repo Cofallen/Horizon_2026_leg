@@ -222,7 +222,7 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
     right->torque_send.T2 = 0.0f;
     right->torque_send.Tw = 0.0f;
   }
-  else if (left->status.stand == 1 || right->status.stand == 1)   // 倒地
+  else if (left->status.stand == 1 || right->status.stand == 1 )   // 倒地TODO
   {
     left->torque_send.T1 = motor->left_front.PID_S.Output;
     left->torque_send.T2 = motor->left_back.PID_S.Output;
@@ -231,15 +231,15 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
     right->torque_send.T2 = motor->right_back.PID_S.Output;
     right->torque_send.Tw = 0.0f;
   }
-  // else if (left->status.stand == 2 || right->status.stand == 2)   // 起立
-  // {
-  //   left->torque_send.T1  = -left->LQR.torque_setT[0];
-  //   left->torque_send.T2  = -left->LQR.torque_setT[1];
-  //   left->torque_send.Tw  =  left->LQR.torque_setW;
-  //   right->torque_send.T1 =  right->LQR.torque_setT[0];
-  //   right->torque_send.T2 =  right->LQR.torque_setT[1];
-  //   right->torque_send.Tw = -right->LQR.torque_setW;
-  // }
+  else if (dbus->Remote.S1_u8 == 2)   // 模拟磕台阶测试
+  {
+    left->torque_send.T1 = motor->left_front.PID_S.Output;
+    left->torque_send.T2 = motor->left_back.PID_S.Output;
+    left->torque_send.Tw = 0.0f;
+    right->torque_send.T1 = motor->right_front.PID_S.Output;
+    right->torque_send.T2 = motor->right_back.PID_S.Output;
+    right->torque_send.Tw = 0.0f;
+  }
 }
 
 
@@ -388,7 +388,6 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
       // 2. 轮电机摆动，髋关节失能
       if (time >= 1000)
       {
-        
         time = 0;
       }
     }
@@ -429,6 +428,7 @@ static void getPIDAim(MOTOR_Typedef *motor)
     motor->right_back.DATA.aim = 0.0f; // 最终位置
     motor->right_back.PID_S.Output = 0.0f;
   }
+  
 }
 
 // 正常后清除目标值
@@ -540,11 +540,11 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     // right->target.l0 = 0.4f;
     left->pid.F0_l_p.Kp = 4000.0f;
     right->pid.F0_l_p.Kp = 4000.0f;
-    left->pid.F0_l_s.max_out = 140.0f;    // 160太大，欠压16
-    right->pid.F0_l_s.max_out = 140.0f;
+    left->pid.F0_l_s.max_out = 200.0f;    // 160太大，欠压16
+    right->pid.F0_l_s.max_out = 200.0f;
     // left->pid.F0_l.max_out = 80.0f;
     // right->pid.F0_l.max_out = 80.0f;
-    if (left->vmc_calc.L0[POS] >= 0.34f && right->vmc_calc.L0[POS] >= 0.34f)
+    if (left->vmc_calc.L0[POS] >= 0.36f && right->vmc_calc.L0[POS] >= 0.36f)
     {
       state = retract;
     }
@@ -598,4 +598,32 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
   }
   left->status.jump = state;
   right->status.jump = state;
+}
+
+// 磕台阶
+// 轨迹 theta 0 -> -120 -> -30 起立
+void Chassis_DownUp(Leg_Typedef *left, Leg_Typedef *right, MOTOR_Typedef *motor, DBUS_Typedef *dbus)
+{
+  if (dbus->Remote.S1_u8 == 2)    // 测试为双环控位置变化
+  {
+    // 更换方式：双环控位置变化
+    float left_aim = 0.0f, right_aim = 0.0f;
+    left_aim = motor->left_back.DATA.pos_rad;     // 初始化为当前值
+    right_aim = motor->right_back.DATA.pos_rad;   // 只考虑一个电机就行
+
+    // 若为遥控磕台阶：
+    if (WHW_V_DBUS.Remote.S1_u8 == 2)
+    {
+      motor->left_back.DATA.aim = 1.5707963267f;
+      if (fabsf(Leg_l.stateSpace.theta - 1.5707963267f) < 0.1f )
+      {
+        motor->left_back.DATA.aim = 0.523598766f;
+        if (fabsf(Leg_l.stateSpace.theta - 0.523598766f) < 0.1f)
+        {
+          motor->left_back.DATA.aim = 0.0f;
+        }
+      }
+    }
+  }
+  
 }
