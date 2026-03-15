@@ -8,36 +8,24 @@
 #include "board2board.h"
 #include "get_target.h"
 
-float PID_S_RF[3] = {5.0f, 0.0f, 0.0f};
-float PID_P_RF[3] = {1.0f, 0.0f, 0.0f};
-float PID_S_RB[3] = {5.0f, 0.0f, 0.0f};
-float PID_P_RB[3] = {1.0f, 0.0f, 0.0f};
+float PID_S_RF[3] = {4.0f, 0.0f, 0.0f};
+float PID_P_RF[3] = {-10.0f, 0.0f, 10.0f};
+float PID_S_RB[3] = {4.0f, 0.0f, 0.0f};
+float PID_P_RB[3] = {-10.0f, 0.0f, 10.0f};
 
 void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {   
     ALL_MOTOR.right_front.DATA.pos_init_rad = -0.593458831f;
     ALL_MOTOR.right_back.DATA.pos_init_rad  = -0.222235471f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
-    PID_Init(&motor->right_front.PID_P, 1.5f, 0.1f, PID_P_RF,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+    PID_Init(&motor->right_front.PID_P, 8.0f, 0.1f, PID_P_RF,
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->right_front.PID_S, 3.0f, 0.1f, PID_S_RF,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
-    PID_Init(&motor->right_back.PID_P, 1.5f, 0.1f, PID_P_RB,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
+    PID_Init(&motor->right_back.PID_P, 8.0f, 0.1f, PID_P_RB,
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->right_back.PID_S, 3.0f, 0.1f, PID_S_RB,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
 }
 
 void ChassisR_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)

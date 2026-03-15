@@ -120,8 +120,8 @@ def get_k(leg_length):
     B_num = np.array(B_sym.subs(eq_point)).astype(np.float64)
 
     # 8. LQR 求解
-    Q = np.diag([3000, 5, 600, 1, 6000, 5])
-    R_mat = np.diag([40, 5]) 
+    Q = np.diag([8000, 5, 1500, 1, 15000, 5])
+    R_mat = np.diag([50, 2]) 
     try:
         P_sol = scipy.linalg.solve_continuous_are(A_num, B_num, Q, R_mat)
         K = np.linalg.inv(R_mat) @ B_num.T @ P_sol
@@ -133,7 +133,7 @@ def get_k(leg_length):
 
 # 把k矩阵输出成c数组K[12]，通过端口发送到串口上
 def send_k(COM):
-    serial_port = serial.Serial(COM, baudrate=115200)
+    # serial_port = serial.Serial(COM, baudrate=115200)
     data = get_k(0.14 )
     if data is not None:
         flat_data = np.array(data).flatten()
@@ -143,8 +143,8 @@ def send_k(COM):
         tail   = b'\xDC'
         data = struct.pack('<' + 'f' * len(flat_data), *flat_data)
         packet = header + data + tail
-        serial_port.write(packet)
-        serial_port.close()
+        # serial_port.write(packet)
+        # serial_port.close()
 
 # 拟合k矩阵 0.08-0.17 步长0.005
 def fit_k():

@@ -11,10 +11,11 @@
 #include "board2board.h"
 #include "get_target.h"
 
-float PID_S_LF[3] = {5.0f, 0.0f, 0.0f};
-float PID_P_LF[3] = {1.0f, 0.0f, 0.0f};
-float PID_S_LB[3] = {5.0f, 0.0f, 0.0f};
-float PID_P_LB[3] = {1.0f, 0.0f, 0.0f};
+// 均单环 P：磕台阶 S: 倒地自启
+float PID_S_LF[3] = {4.0f, 0.0f, 0.0f};
+float PID_P_LF[3] = {10.0f, 0.0f, 10.0f};
+float PID_S_LB[3] = {4.0f, 0.0f, 0.0f};
+float PID_P_LB[3] = {10.0f, 0.0f, 10.0f};
 
 const float PID_Follow_param[3] = {0.1f, 0.0f, 0.0f};
 pid_type_def pid_follow = {0};
@@ -26,26 +27,14 @@ void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
     ALL_MOTOR.left_front.DATA.pos_init_rad = 1.95352459f;
     ALL_MOTOR.left_back.DATA.pos_init_rad  = -0.25751704f;   // 读取lr都应取负
     ALL_MOTOR.left_wheel.DATA.Angle_Init   = ALL_MOTOR.left_wheel.DATA.Angle_Infinite;
-    PID_Init(&motor->left_front.PID_P, 1.0f, 0.1f, PID_P_LF,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+    PID_Init(&motor->left_front.PID_P, 10.0f, 0.1f, PID_P_LF,
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->left_front.PID_S, 3.0f, 0.1f, PID_S_LF,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
-    PID_Init(&motor->left_back.PID_P, 2.0f, 0.1f, PID_P_LB,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
+    PID_Init(&motor->left_back.PID_P, 10.0f, 0.1f, PID_P_LB,
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->left_back.PID_S, 3.0f, 0.1f, PID_S_LB,
-              2000.0f, 1000.0f, 0.7f, 0.7f, 2, 
-              Integral_Limit|OutputFilter|ErrorHandle|
-              Trapezoid_Intergral|ChangingIntegrationRate|
-              Derivative_On_Measurement|DerivativeFilter);
+              0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_init(&pid_follow, 0, PID_Follow_param, 2.0f, 0);
 
 }
@@ -231,20 +220,60 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
     right->torque_send.T2 = motor->right_back.PID_S.Output;
     right->torque_send.Tw = 0.0f;
   }
-  else if (dbus->Remote.S1_u8 == 2)   // 模拟磕台阶测试
+  else if (left->status.stand == 2 || right->status.stand == 2 )   // 倒地TODO
   {
-    left->torque_send.T1 = motor->left_front.PID_S.Output;
-    left->torque_send.T2 = motor->left_back.PID_S.Output;
+    // left->torque_send.T1 = 0.0f;
+    left->torque_send.T2 = left->torque_send.T1 * 0.1f;
+    // left->torque_send.Tw = 0.0f;
+    // right->torque_send.T1 = 0.0f;
+    right->torque_send.T2 = right->torque_send.T1 * 0.1f;
+    // right->torque_send.Tw = 0.0f;
+  }
+  else if (Leg_l.status.step_flag || Leg_r.status.step_flag)   // 模拟磕台阶测试
+  {
+    left->torque_send.T1 = motor->left_front.PID_P.Output;
+    left->torque_send.T2 = motor->left_back.PID_P.Output;
     left->torque_send.Tw = 0.0f;
-    right->torque_send.T1 = motor->right_front.PID_S.Output;
-    right->torque_send.T2 = motor->right_back.PID_S.Output;
+    right->torque_send.T1 = motor->right_front.PID_P.Output;
+    right->torque_send.T2 = motor->right_back.PID_P.Output;
     right->torque_send.Tw = 0.0f;
   }
 }
 
+uint16_t cca = 0, ccb = 0;
 
 void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
-{ 
+{   
+    const uint32_t STEP_KEEP = 500;
+    static uint32_t step_count = 0;
+
+    uint8_t trigger = (Leg_l.vmc_calc.L0[POS] >= 0.3f && Leg_l.stateSpace.theta > 0.3f)
+                    || (Leg_r.vmc_calc.L0[POS] >= 0.3f && Leg_r.stateSpace.theta > 0.3f);
+
+    if (!left->status.step_flag && trigger)
+    {
+        // 触发，进入保持状态并清零计数
+        left->status.step_flag = 1;
+        right->status.step_flag = 1;
+        step_count = 0;
+    }
+    else if (left->status.step_flag)
+    {
+        // 已在保持状态，计数增长；当触发消失或达到阈值时退出保持
+        step_count++;
+        if (!trigger || step_count >= STEP_KEEP)
+        {
+            left->status.step_flag = 0;
+            right->status.step_flag = 0;
+        }
+    }
+    else
+    {
+        // 未触发且未处于保持，保持为0
+        left->status.step_flag = 0;
+        right->status.step_flag = 0;
+    }
+    
     // 离地状态
     if (fabs(left->LQR.Fn) <= 20.0f)
     {
@@ -273,10 +302,10 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f) && ((left->stateSpace.theta > 0) && (right->stateSpace.theta > 0));
     // uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f);
     // 使用 left->status.stand 作为整车的状态标志 (0:正常, 1:倒地, 2:恢复)
-    if (fabsf(IMU_Data.pitch) > 60.0f || fabsf(IMU_Data.roll) > 60.0f)
-    {
-      is_fallen = 1;
-    }
+    // if (fabsf(IMU_Data.pitch) > 60.0f || fabsf(IMU_Data.roll) > 60.0f)
+    // {
+    //   is_fallen = 1;
+    // }
     
     switch (left->status.stand)
     {
@@ -303,8 +332,12 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
       // }
       // else
       // {
-        left->status.stand_count++;
-        right->status.stand_count++;
+        if (fabsf(left->stateSpace.theta - 0.3f) < 0.1f && fabsf(right->stateSpace.theta - 0.3f) < 0.1f)
+        {
+          left->status.stand_count++;
+          right->status.stand_count++;
+        }
+      
         if (left->status.stand_count >= 200 || right->status.stand_count >= 200)
         {
           left->status.stand_count = 0;
@@ -318,6 +351,8 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
       break;
     }
 }
+
+float limitl = 6.0f, limitw = 2.0f;
 
 // 不同状态处理，用于切换K阵
 void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
@@ -365,6 +400,9 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
     }
     else if (machine_state == 2) // 恢复
     {
+      //  memcpy(left->LQR.K , ChassisL_LQR_K_stand, sizeof(ChassisL_LQR_K));
+      // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(ChassisR_LQR_K));
+      
       // 1. 收腿
       left->target.l0 = MIN_LEG_LENGTH;
       right->target.l0 = MIN_LEG_LENGTH;
@@ -379,10 +417,10 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
       }
       else
       {
-        left->limit.T_max = 2.0f;
-        right->limit.T_max = 2.0f;
-        left->limit.W_max = 1.0f;
-        right->limit.W_max = 1.0f;
+        left->limit.T_max = limitl;
+        right->limit.T_max = limitl;
+        left->limit.W_max = limitw;
+        right->limit.W_max = limitw;
       }
       time++;
       // 2. 轮电机摆动，髋关节失能
@@ -402,7 +440,7 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
 
 // 获取目标值，使用规划
 // 先一定速度旋转一定时间，后过零点后采用位置控制
-static void getPIDAim(MOTOR_Typedef *motor)
+static void getPIDAim_Speed(MOTOR_Typedef *motor)
 {
   motor->left_front.DATA.aim = -1.0f; // 设定0.2rad/s
   if (Leg_l.stateSpace.theta >= 0.0f && Leg_l.stateSpace.theta <= 1.2f)
@@ -431,6 +469,20 @@ static void getPIDAim(MOTOR_Typedef *motor)
   
 }
 
+// 获取位置规划目标值
+void get_PIDAim_Pos(MOTOR_Typedef *motor, uint8_t mode)
+{
+  switch (mode)
+  {
+  case 0:   // 倒地自启 left: theta 0
+
+    break;
+  
+  default:
+    break;
+  }
+}
+
 // 正常后清除目标值
 static void ClearAim(MOTOR_Typedef *motor)
 {
@@ -444,16 +496,17 @@ static void ClearAim(MOTOR_Typedef *motor)
 // 倒地后旋转腿，采用pid测试
 void Chassis_Rotate(MOTOR_Typedef *motor)
 {
-  getPIDAim(motor);
+  getPIDAim_Speed(motor);
+
+  // PID_Calculate(&motor->left_front.PID_P, Leg_l.stateSpace.theta, motor->left_front.DATA.aim);
+  // PID_Calculate(&motor->left_back.PID_P, Leg_l.stateSpace.theta, motor->left_back.DATA.aim);
+  // PID_Calculate(&motor->right_front.PID_P, Leg_r.stateSpace.theta, motor->right_front.DATA.aim);
+  // PID_Calculate(&motor->right_back.PID_P, Leg_r.stateSpace.theta, motor->right_back.DATA.aim);
+
   PID_Calculate(&motor->left_front.PID_S, motor->left_front.DATA.vel, motor->left_front.DATA.aim);
   PID_Calculate(&motor->left_back.PID_S, motor->left_back.DATA.vel, motor->left_back.DATA.aim);
   PID_Calculate(&motor->right_front.PID_S, motor->right_front.DATA.vel, motor->right_front.DATA.aim);
   PID_Calculate(&motor->right_back.PID_S, motor->right_back.DATA.vel, motor->right_back.DATA.aim);
-
-  // mit_ctrl(&hcan1, LEG_LF+1, 0, 0, 0, 0, motor->left_front.PID_S.Output);
-  // mit_ctrl(&hcan1, LEG_LB+1, 0, 0, 0, 0, motor->left_back.PID_S.Output);
-  // mit_ctrl(&hcan1, LEG_RF+1, 0, 0, 0, 0, motor->right_front.PID_S.Output);
-  // mit_ctrl(&hcan1, LEG_RB+1, 0, 0, 0, 0, motor->right_back.PID_S.Output);
 
 }
 
@@ -600,30 +653,62 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
   right->status.jump = state;
 }
 
-// 磕台阶
+// 磕台阶 只考虑后面电机即可，自动实现收腿了，可能再伸腿需要两个电机
 // 轨迹 theta 0 -> -120 -> -30 起立
 void Chassis_DownUp(Leg_Typedef *left, Leg_Typedef *right, MOTOR_Typedef *motor, DBUS_Typedef *dbus)
 {
-  if (dbus->Remote.S1_u8 == 2)    // 测试为双环控位置变化
+  if (left->status.step_flag || right->status.step_flag)    // 测试为双环控位置变化
   {
     // 更换方式：双环控位置变化
     float left_aim = 0.0f, right_aim = 0.0f;
     left_aim = motor->left_back.DATA.pos_rad;     // 初始化为当前值
     right_aim = motor->right_back.DATA.pos_rad;   // 只考虑一个电机就行
 
-    // 若为遥控磕台阶：
-    if (WHW_V_DBUS.Remote.S1_u8 == 2)
+
+    // 收腿时最小腿长
+    Leg_l.target.l0 = MIN_LEG_LENGTH;
+    Leg_r.target.l0 = MIN_LEG_LENGTH;
+
+    // // 改变pid参数
+    // motor->left_back.PID_P.Kp = 1.0f;
+    // motor->left_back.PID_P.Ki = 0.0f;
+    // motor->left_back.PID_P.Kd = 0.0f;
+    // motor->right_back.PID_P.Kp = 2.0f;
+    // motor->left_back.PID_P.Ki = 0.0f;
+    // motor->left_back.PID_P.Kd = 0.0f;
+    
+    // motor->left_back.PID_S.Kp = 1.0f;
+    // motor->left_back.PID_S.Ki = 0.0f;
+    // motor->left_back.PID_S.Kd = 0.0f;
+    // motor->right_back.PID_S.Kp = 2.0f;
+    // motor->left_back.PID_S.Ki = 0.0f;
+    // motor->left_back.PID_S.Kd = 0.0f;
+
+    // motor->left_back.PID_S.MaxOut = 2.0f;
+    // motor->right_back.PID_S.MaxOut = 2.0f;
+
+    motor->left_back.DATA.aim = 1.4f;
+    motor->right_back.DATA.aim = 1.4f;
+    if (fabsf(Leg_l.stateSpace.theta - 1.3f) < 0.1f )
     {
-      motor->left_back.DATA.aim = 1.5707963267f;
-      if (fabsf(Leg_l.stateSpace.theta - 1.5707963267f) < 0.1f )
-      {
-        motor->left_back.DATA.aim = 0.523598766f;
-        if (fabsf(Leg_l.stateSpace.theta - 0.523598766f) < 0.1f)
-        {
-          motor->left_back.DATA.aim = 0.0f;
-        }
-      }
+      // motor->left_back.DATA.aim = 0.4;
+      // motor->right_back.DATA.aim = 0.4f;
+      // if (fabsf(Leg_l.stateSpace.theta - 0.523598766f) < 0.1f)
+      // {
+        motor->left_back.DATA.aim = 0.0f;
+        motor->right_back.DATA.aim = 0.0f;
+      // }
     }
+
+    // PID_Calculate(&motor->left_front.PID_P, Leg_l.stateSpace.theta, motor->left_back.DATA.aim);
+    PID_Calculate(&motor->left_back.PID_P, Leg_l.stateSpace.theta, motor->left_back.DATA.aim);
+    // PID_Calculate(&motor->right_front.PID_P, Leg_l.stateSpace.theta, motor->left_back.DATA.aim);  // 使用左 的theta
+    PID_Calculate(&motor->right_back.PID_P, Leg_l.stateSpace.theta, motor->left_back.DATA.aim);
+
+    // PID_Calculate(&motor->left_front.PID_S, motor->left_front.DATA.vel, motor->left_front.PID_P.Output);
+    // PID_Calculate(&motor->left_back.PID_S, motor->left_back.DATA.vel, motor->left_back.PID_P.Output);
+    // PID_Calculate(&motor->right_front.PID_S, motor->right_front.DATA.vel, -motor->right_front.PID_P.Output);
+    // PID_Calculate(&motor->right_back.PID_S, motor->right_back.DATA.vel, -motor->right_back.PID_P.Output);
   }
   
 }

@@ -26,7 +26,7 @@
 
 #define MAX_TORQUE_LEG_T 25.0f
 #define MAX_TORQUE_LEG_W 6.0f
-#define MAX_LEG_LENGTH 0.39f
+#define MAX_LEG_LENGTH 0.345f
 #define MIN_LEG_LENGTH 0.16f
 
 #define REDUCTION_RATIO 15.764705882352941176470588235294f   // 268/17
@@ -108,6 +108,7 @@ typedef struct
         uint8_t jump;
         uint8_t stand;
         uint16_t stand_count;   // 延迟起立lqr时间
+        uint8_t step_flag;      // 磕台阶
         uint8_t err[2];
     }status;
 

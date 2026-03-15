@@ -7,11 +7,12 @@ typedef union
 {
     struct __packed
     {
-        int16_t ch2;
-        int16_t ch3;
-        uint8_t s1;
-        uint8_t s2;
-        int16_t pitch;
+        int16_t ch2: 11;
+        int16_t ch3: 11;
+        int16_t dir: 11;
+        int16_t pitch :16;
+        uint8_t s1: 2;
+        uint8_t s2: 2;
     } dataNeaten;
     uint8_t sendData[8];
 }boardTxData_t;
@@ -24,7 +25,7 @@ typedef union
     } dataNeaten;
     uint8_t rxData[8];
 }boardRxData_t;
-void Board_to_board_send(boardTxData_t* send, int16_t ch2, int16_t ch3, uint8_t s1, uint8_t s2, float pitch );
+void Board_to_board_send(boardTxData_t* send, int16_t ch2, int16_t ch3, int16_t dir, uint8_t s1, uint8_t s2, float pitch);
 void Board_to_board_recv(boardRxData_t* recv, uint8_t *data);
 
 extern boardRxData_t boardRxData;

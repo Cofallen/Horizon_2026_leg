@@ -110,7 +110,15 @@ void StartGimbalTask(void const *argument)
         ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetStatus(&Leg_l, &Leg_r);
-        Chassis_StateHandle(&Leg_l, &Leg_r);
+        if (Leg_l.status.step_flag || Leg_r.status.step_flag)
+        {
+            Chassis_DownUp(&Leg_l, &Leg_r, &ALL_MOTOR, &WHW_V_DBUS);
+        }
+        else
+        {
+            Chassis_StateHandle(&Leg_l, &Leg_r);
+        }
+        
         // Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
         ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
@@ -193,6 +201,7 @@ void StartK3debugTask(void const * argument)
         //                 Leg_r.pid.F0_l.Dout);   
         Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
                                           WHW_V_DBUS.Remote.CH3_int16,
+                                          WHW_V_DBUS.Remote.Dial_int16,
                                           WHW_V_DBUS.Remote.S1_u8,
                                           WHW_V_DBUS.Remote.S2_u8,
                                           IMU_Data.pitch);

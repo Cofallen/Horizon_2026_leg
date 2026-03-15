@@ -22,7 +22,7 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     object->target.d2theta = 0.0f;
 
     // const float F0_control[3] = {8000.0f, 0.0f, 30000.0f};  // 下落状态切换
-    const float F0_control_P[3] = {5000.0f, 1.0f, 30000.0f};
+    const float F0_control_P[3] = {4000.0f, 1.0f, 40000.0f};
     const float F0_control_S[3] = {1.0f, 0.0f, 0.0f};
     const float Yaw_control_P[3] = {3.0f, 0.0f, 600.0f};
     const float Yaw_control_S[3] = {1.0f, 0.0f, 0.0f};
@@ -31,15 +31,15 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     const float Roll_control_P[3] = {1000.0f, 0.0f, 300.0f};
     const float Roll_control_S[3] = {1.0f, 0.0f, 0.0f};
 
-    PID_init(&object->pid.F0_l_p, PID_POSITION, F0_control_P, 80.0f, 0.0f);
-    PID_init(&object->pid.F0_l_s, PID_POSITION, F0_control_S, 80.0f, 0.0f);
+    PID_init(&object->pid.F0_l_p, PID_POSITION, F0_control_P, 140.0f, 0.0f);
+    PID_init(&object->pid.F0_l_s, PID_POSITION, F0_control_S, 140.0f, 0.0f);
     // PID_Init(&object->pid.F0_l_x, 80.0f, 10.0f, F0_control, 
     //                     2000.0f, 2000.0f, 0.7f, 0.7f, 
     //                     0, Integral_Limit|Derivative_On_Measurement|Trapezoid_Intergral|
     //                         OutputFilter|ChangingIntegrationRate|DerivativeFilter|ErrorHandle);
     PID_init(&object->pid.Yaw, PID_POSITION, Yaw_control_P, 2.0f, 0.0f);
     PID_init(&object->pid.Delta, PID_POSITION, Delta_control_P, 10.0f, 0.2f);
-    PID_init(&object->pid.Roll, PID_POSITION, Roll_control_P, 20.0f, 0.0f);
+    PID_init(&object->pid.Roll, PID_POSITION, Roll_control_P, 60.0f, 0.0f);
 }
 
 void Vmc_calcL(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)
