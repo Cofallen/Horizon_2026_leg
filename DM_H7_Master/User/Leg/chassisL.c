@@ -352,7 +352,7 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     }
 }
 
-float limitl = 6.0f, limitw = 2.0f;
+float limitl = 4.0f, limitw = 2.0f;
 
 // 不同状态处理，用于切换K阵
 void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)

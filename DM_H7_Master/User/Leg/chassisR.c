@@ -18,11 +18,11 @@ void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
     ALL_MOTOR.right_front.DATA.pos_init_rad = -0.593458831f;
     ALL_MOTOR.right_back.DATA.pos_init_rad  = -0.222235471f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
-    PID_Init(&motor->right_front.PID_P, 8.0f, 0.1f, PID_P_RF,
+    PID_Init(&motor->right_front.PID_P, 6.0f, 0.1f, PID_P_RF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->right_front.PID_S, 3.0f, 0.1f, PID_S_RF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
-    PID_Init(&motor->right_back.PID_P, 8.0f, 0.1f, PID_P_RB,
+    PID_Init(&motor->right_back.PID_P, 6.0f, 0.1f, PID_P_RB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->right_back.PID_S, 3.0f, 0.1f, PID_S_RB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);

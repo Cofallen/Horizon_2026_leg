@@ -64,8 +64,8 @@ void StartRobotUITask(void const *argument)
 	
     for(;;)
     {
-		
-        vTaskDelayUntil(&currentTimeRobotUI, 1);
+		osDelay(1);
+        // vTaskDelayUntil(&currentTimeRobotUI, 1);
     }
 }
 
@@ -78,7 +78,8 @@ void StartIMUTask(void const *argument)
     for(;;)
     {
         INS_Task(&IMU_Data, &temppid);
-        vTaskDelayUntil(&currentTimeIMU, 1);
+        // vTaskDelayUntil(&currentTimeIMU, 1);
+        osDelay(1);
     }
 }
 
