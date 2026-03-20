@@ -98,10 +98,10 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     // 目标值获取应加上滤波 重写一个函数
     Chassis_Get_target(object, dbus, imu, dt);
 
-    VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
-                        IMU_Data.yaw,
-                        (float)outppp,
-                        0,0,0,0,0,0,0);
+    // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
+    //                     IMU_Data.yaw,
+    //                     (float)outppp,
+    //                     0,0,0,0,0,0,0);
 
     object->LQR.T_w = (object->LQR.K[0] * (object->stateSpace.theta - object->target.theta) +
                      object->LQR.K[1] * (object->stateSpace.dtheta - object->target.dtheta) +
@@ -242,6 +242,11 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
 
 uint16_t cca = 0, ccb = 0;
 
+float w[] = { -28.34938669, -11.98377804, -2.17986551, 1.24582719, -0.53433661, -0.74622627, -2.37520701, -7.69283337, -0.69299153, 0.76600141, -1.52070556, 0.37045245 };
+float b = 15.60211442;
+float mean[] = { 4.91989870, -1.52500986, -0.01762047, 0.00137789, 0.16068342, 0.73523494, -0.01592070, 0.97824851, 0.30693136, 0.00015242, 0.97611212, 9.68234208 };
+float std[] = { 72.77303549, 8.93511629, 0.20958454, 0.40085100, 0.68900020, 698.17346026, 0.20294189, 0.03988713, 0.09888232, 0.08829290, 187.76820550, 0.55401940 };
+
 void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 {   
     const uint32_t STEP_KEEP = 500;
@@ -275,22 +280,9 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     }
     
     // 离地状态
-    if (fabs(left->LQR.Fn) <= 20.0f)
-    {
-      left->status.offGround = 1;
-      // memcpy(left->LQR.K, ChassisL_LQR_K_fall, sizeof(float) * 12);
-    } else {
-      left->status.offGround = 0;
-      // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
-    }
-    if (fabs(right->LQR.Fn) <= 20.0f)
-    {
-      right->status.offGround = 1;
-      // memcpy(right->LQR.K, ChassisR_LQR_K_fall, sizeof(float) * 12);
-    } else {
-      right->status.offGround = 0;
-      // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
-    }
+    left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
+    right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
+    
     // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
     // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
