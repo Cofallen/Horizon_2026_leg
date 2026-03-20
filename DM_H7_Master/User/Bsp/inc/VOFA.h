@@ -13,5 +13,6 @@
 #include "usbd_cdc_if.h"
 
 void VOFA_justfloat(float a,float b,float c,float d,float e,float f,float g,float h,float j,float k);
+void VOFA_justfloat_ML(float a,float b,float c,float d,float e,float f,float g,float h,float j,float k, float l, float m);
 
 #endif
