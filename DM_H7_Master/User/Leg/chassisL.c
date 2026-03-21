@@ -76,8 +76,8 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
     Leg_l->stateSpace.raw_dot_s = dot_s;
     Leg_r->stateSpace.raw_dot_s = dot_s;
     
-    Leg_l->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);
-    Leg_r->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, -IMU_Data.accel[0]);;
+    Leg_l->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, IMU_Data.accel[1]);
+    Leg_r->stateSpace.dot_s = xvEstimateKF_Update(&vaEstimateKF, dot_s, IMU_Data.accel[1]);;
     Leg_l->stateSpace.s     = Discreteness_Sum(&Leg_l->Discreteness.dS, Leg_l->stateSpace.dot_s, dt);
     Leg_r->stateSpace.s     = Discreteness_Sum(&Leg_r->Discreteness.dS, Leg_r->stateSpace.dot_s, dt);
 

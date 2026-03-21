@@ -9,7 +9,7 @@ float yaw_process = 0.0f;
 void Chassis_Get_target(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, float dt)
 {
     // object->target.theta = (float)dbus->Remote.CH1_int16 / 660.0f * 1.0f;
-    object->target.theta = 0.08f;
+    object->target.theta = 0.0f;
     object->target.dtheta = 0.0f;
     object->target.dot_s = (float)dbus->Remote.CH1_int16 / 660.0f * 2.0f + (float)(dbus->KeyBoard.W - dbus->KeyBoard.S) * 0.3f;
     object->target.s = Discreteness_Sum(&object->Discreteness.target_s, object->target.dot_s, dt);
