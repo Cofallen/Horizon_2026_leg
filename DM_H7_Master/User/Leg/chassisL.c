@@ -24,8 +24,8 @@ float outppp = 0;
 void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {
     // BM_EnableDisable()
-    ALL_MOTOR.left_front.DATA.pos_init_rad = 1.95352459f;
-    ALL_MOTOR.left_back.DATA.pos_init_rad  = -0.25751704f;   // 读取lr都应取负
+    ALL_MOTOR.left_front.DATA.pos_init_rad = 1.88104403f;
+    ALL_MOTOR.left_back.DATA.pos_init_rad  = 1.39247108f;   // 读取lr都应取负
     ALL_MOTOR.left_wheel.DATA.Angle_Init   = ALL_MOTOR.left_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->left_front.PID_P, 10.0f, 0.1f, PID_P_LF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);

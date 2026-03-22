@@ -8,19 +8,39 @@
 
 - [ ] 旋转补偿
 
-- [x] 倒地自启
+- [ ] 倒地自启
 
-- [ ] 离地检测
+- [x] 离地检测
 
 - [x] 打滑检测
 
-- [x] 上台阶
+- [ ] 上台阶
 
 - [ ] 重心动态补偿
 
 ### 问题
 
 - [x] 遥控好像跳一次就控不了了，换遥控几次可以。
+- [ ] 离地检测有部分程度误判
+
+采用的单神经网络，Logistic Regression，很明显采集数据不够。下次采集200万数据以上。
+
+空中状态轮子仍有输出？？
+
+- [ ] 零点漂移
+
+减小轮子R，即增加其扭矩输出后，发现只会抖动，不会移动，因此猜测是力矩在低电流输出下的效果不好。默认必须减速比加上19：1的项，否则物理参数感觉不对。
+
+待测试低扭矩的死区设置，目前打算按照0.5下按照e指数衰减测试。
+
+- [ ] 磕上台阶
+
+状态判断有概率不对，应增加条件，收腿的动作在优化好起身和平衡的状态后再进行。
+
+- [ ] 头朝下倒地自启
+
+这个规划一下腿的旋转逻辑即可。目前计划舍弃PID方案（因为效果参数太难测试）。
+
 
 ### 心得
 
@@ -119,72 +139,6 @@ R_mat = np.diag([50, 5])
 
 经过测试后，舍弃原仿真和上交方案，选取中石油方案，即将跳跃简化为三个状态。
 
-```c
-switch (state)
-  {
-  case idle:
-    break;
-  
-  case compact:
-    left->target.l0 -= 0.0002f;
-    right->target.l0 -= 0.0002f;
-    if (left->vmc_calc.L0[POS] <= 0.16f && right->vmc_calc.L0[POS] <= 0.16f)
-    {
-      state = flight;
-    }
-    break;
-
-  case flight:
-    left->target.l0 += 0.0012f;
-    right->target.l0 += 0.0012f;
-    left->pid.F0_l.Kp = 1000.0f;
-    right->pid.F0_l.Kp = 1000.0f;
-    left->pid.F0_l.max_out = 140.0f;    // 160太大，欠压16
-    right->pid.F0_l.max_out = 140.0f;
-    if (left->vmc_calc.L0[POS] >= 0.34f && right->vmc_calc.L0[POS] >= 0.34f)
-    {
-      state = retract;
-    }
-    break;
-
-  case retract:
-    left->target.l0 = 0.10f;
-    right->target.l0 = 0.10f;
-    left->limit.W_max = 0.0f;
-    right->limit.W_max = 0.0f;
-    if (left->vmc_calc.L0[POS] <= 0.14f && right->vmc_calc.L0[POS] <= 0.14f)
-    {
-      state = idle;
-      left->limit.W_max = 6.0f;
-      right->limit.W_max = 6.0f;
-      left->pid.F0_l.Kp = 5000.0f;
-      right->pid.F0_l.Kp = 5000.0f;
-      left->pid.F0_l.Kd = 30000.0f;
-      right->pid.F0_l.Kd = 30000.0f;
-      left->pid.F0_l.max_out = 80.0f;
-      right->pid.F0_l.max_out = 80.0f;
-    }
-    break;
-
-  case extend:
-    left->target.l0 = 0.14f;
-    right->target.l0 = 0.14f;      
-    left->pid.F0_l.Kd = 60000.0f;
-    right->pid.F0_l.Kd = 60000.0f;
-    state = idle;
-    left->pid.F0_l.Kp = 6000.0f;
-    right->pid.F0_l.Kp = 6000.0f;
-    left->pid.F0_l.Kd = 20000.0f;
-    right->pid.F0_l.Kd = 20000.0f;
-    left->pid.F0_l.max_out = 80.0f;
-    right->pid.F0_l.max_out = 80.0f;
-    break;
-
-  default:
-    state = idle;
-    break;
-  }
-```
 
 注意上述代码`extend`状态下直接退出该状态（或者直接删了？），因此是等效写法。跳跃测试时先原地能稳住再说。另外，删掉伸腿是因为该Pid难调，收腿后直接伸到最大腿长再收腿，会导致失稳，索性直接去了，后也发现中石油是采用该方案，决定最终这样写。**跳跃高度取决于限幅和判断。** 
 
@@ -248,3 +202,5 @@ void UART5_IRQHandler(void)
 - 2026-1-25 基础测试大多完成，还是有点问题。
 
 - 2026-1-26 抽象，这车都坏多少次了，这两天真难修，碳管都断裂了。还是别测难的了，别回去还是坏的。不过倒地自启还行，中石油方案还是太简单了，不能真正提高稳定性。
+
+- 2026-3-23 每天调试一点，争取解决所有小问题
