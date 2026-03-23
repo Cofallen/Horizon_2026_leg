@@ -33,6 +33,15 @@
 // #define TORQUE_RATE 0.06894876031507928693743672227522f      // 含减速箱0.92
 // #define TORQUE_RATE 0.22983222247759135830843484256493f    // 0.3* 268/17 * 0.92 倒数
 #define TORQUE_RATE 0.76334365325077430968421052631579f    // 1.0f/19.0f * 15.764705882352941176470588235294f * 0.92f 
+// #define TORQUE_RATE 2824.5f     // 0.02nM -> 15.7
+
+
+/* 电机参数 */
+#define KT              0.0157f          // N·m/A
+#define RATIO           (268.0f / 17.0f) // ≈ 15.7647
+#define ETA             0.92f
+#define TORQUE_TO_CMD_MOTOR(TORQUE_NM)   ((TORQUE_NM) * (819.2f / KT))
+#define TORQUE_TO_CMD_LOAD(TORQUE_NM)    ((TORQUE_NM) * (819.2f / (KT * RATIO * ETA)))
 
 typedef struct 
 {

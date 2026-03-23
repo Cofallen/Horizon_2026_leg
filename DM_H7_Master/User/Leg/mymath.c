@@ -43,6 +43,11 @@ void DJI_Torque_Control(hcan_t* hcan, uint16_t stdid, float t1, float t2, float 
     uint8_t Data[8];
 
     int16_t num1, num2, num3, num4;
+    (fabsf(t1) < 0.0f) ? (t1 = 0.0f) : (t1 = t1);
+    (fabsf(t2) < 0.0f) ? (t2 = 0.0f) : (t2 = t2);
+    (fabsf(t3) < 0.0f) ? (t3 = 0.0f) : (t3 = t3);
+    (fabsf(t4) < 0.0f) ? (t4 = 0.0f) : (t4 = t4);
+    
     num1 = (int16_t)(t1 * TUEQUE2NUM * TORQUE_RATE);
     num2 = (int16_t)(t2 * TUEQUE2NUM * TORQUE_RATE);
     num3 = (int16_t)(t3 * TUEQUE2NUM * TORQUE_RATE);

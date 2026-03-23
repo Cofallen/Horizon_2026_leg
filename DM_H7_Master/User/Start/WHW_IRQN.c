@@ -147,8 +147,12 @@ void StartMonitorTask(void const * argument)
                             Leg_r.torque_send.T2);
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
-
-        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
+        if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0)
+        {
+            DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);   
+        }
+        
+        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
         osDelay(1);
