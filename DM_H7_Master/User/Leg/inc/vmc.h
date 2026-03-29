@@ -52,6 +52,11 @@ typedef struct
     float phi3[3];
     float phi4[3];
     float JRM[2][2];            // 雅可比矩阵
+    float alpha;                // 气弹簧解算对应角
+    float ls;                   // 气弹簧解算对应长度
+    float Fv;                   // 气弹簧等效作用支持力
+    float s3;
+    float theta3;
 }vmc_Typedef;                   // vmc正解计算中间变量
 
 typedef struct 
@@ -166,5 +171,6 @@ static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu);
 static float Vmc_getFnR(Leg_Typedef *object, IMU_Data_t *imu);
 uint8_t ground_check(Leg_Typedef *leg, IMU_Data_t *imu, float *w, float b, float *mean, float *std);
 
+float Vmc_get_Fs(float L0, vmc_Typedef *vmc);
 
 #endif // !__VMC_H

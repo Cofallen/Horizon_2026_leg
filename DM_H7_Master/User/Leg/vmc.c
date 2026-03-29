@@ -59,6 +59,7 @@ void Vmc_calcL(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float
     
     getMatJRM(&object->vmc_calc, object->vmc_calc.phi0[POS], object->vmc_calc.phi1[POS], object->vmc_calc.phi2[POS], object->vmc_calc.phi3[POS], object->vmc_calc.phi4[POS], object->vmc_calc.L0[POS], L1_LENGTH, L4_LENGTH);
     Vmc_getFnL(object, imu);
+    Vmc_get_Fs(object->vmc_calc.L0[POS], &object->vmc_calc);
 }
 
 
@@ -79,6 +80,7 @@ void Vmc_calcR(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float
 
     getMatJRM(&object->vmc_calc, object->vmc_calc.phi0[POS], object->vmc_calc.phi1[POS], object->vmc_calc.phi2[POS], object->vmc_calc.phi3[POS], object->vmc_calc.phi4[POS], object->vmc_calc.L0[POS], L1_LENGTH, L4_LENGTH);
     Vmc_getFnR(object, imu);
+    Vmc_get_Fs(object->vmc_calc.L0[POS], &object->vmc_calc);
 }
 
 
@@ -176,4 +178,25 @@ uint8_t ground_check(Leg_Typedef *leg, IMU_Data_t *imu, float *w, float b, float
     // VOFA_justfloat(norm[0], norm[1],norm[2],norm[3],norm[4],norm[5],norm[6],norm[7],norm[8],norm[9]);
     return (prob >= 0.5) ? 1 : 0;
     
+}
+
+
+// 气弹簧补偿计算
+float Vmc_get_Fs(float L0, vmc_Typedef *vmc)
+{
+    float l1 = 0.215f, l2 = 0.258f;
+    float s1 = 0.05f, s2 = 0.055f;
+    float Fs = 300.0f;      // 气弹簧静态力
+
+    // float s3 = 0.0f;        // 对角线
+    vmc->theta3 = acosf((l1 * l1 + l2 * l2 - L0 * L0) / (2.0f * l1 * l2));
+    vmc->s3 = sqrtf(l1 * l1 + s2 * s2 - 2.0f * l1 * s2 * cos(vmc->theta3));
+    vmc->alpha = acosf((l1 * l1 + vmc->s3 * vmc->s3 - s1 * s1) /
+                  (2.0f * l1 * vmc->s3));
+    vmc->ls = sqrtf(l1 * l1 + s2 * s2 - 2.0f * l1 * s2 * cos(vmc->theta3 - vmc->alpha));
+
+    vmc->Fv = Fs * (L0 * s2 * vmc->s3 * sin(vmc->theta3 - vmc->alpha) /
+               (vmc->ls * l1 * l2 * sin(vmc->theta3)));
+
+    return vmc->Fv;
 }

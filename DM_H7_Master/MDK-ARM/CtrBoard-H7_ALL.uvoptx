@@ -168,7 +168,7 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ALL_MOTOR</ItemText>
+          <ItemText>ALL_MOTOR,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
