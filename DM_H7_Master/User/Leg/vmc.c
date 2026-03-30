@@ -31,8 +31,8 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     const float Roll_control_P[3] = {1000.0f, 0.0f, 3000.0f};
     const float Roll_control_S[3] = {1.0f, 0.0f, 0.0f};
 
-    PID_init(&object->pid.F0_l_p, PID_POSITION, F0_control_P, 200.0f, 0.0f);
-    PID_init(&object->pid.F0_l_s, PID_POSITION, F0_control_S, 200.0f, 0.0f);
+    PID_init(&object->pid.F0_l_p, PID_POSITION, F0_control_P, 150.0f, 0.0f);
+    PID_init(&object->pid.F0_l_s, PID_POSITION, F0_control_S, 150.0f, 0.0f);
     // PID_Init(&object->pid.F0_l_x, 80.0f, 10.0f, F0_control, 
     //                     2000.0f, 2000.0f, 0.7f, 0.7f, 
     //                     0, Integral_Limit|Derivative_On_Measurement|Trapezoid_Intergral|
@@ -186,7 +186,7 @@ float Vmc_get_Fs(float L0, vmc_Typedef *vmc)
 {
     float l1 = 0.215f, l2 = 0.258f;
     float s1 = 0.05f, s2 = 0.055f;
-    float Fs = 300.0f;      // 气弹簧静态力
+    float Fs = 200.0f;      // 气弹簧静态力
 
     // float s3 = 0.0f;        // 对角线
     vmc->theta3 = acosf((l1 * l1 + l2 * l2 - L0 * L0) / (2.0f * l1 * l2));
