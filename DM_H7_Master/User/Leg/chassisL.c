@@ -317,13 +317,6 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
       // 否则保持倒地
       break;
     case 2:   // 恢复状态
-      // if (is_fallen)  // 如果再次倒地，切回上一个状态
-      // {
-      //   left->status.stand = 1;
-      //   right->status.stand = 1;
-      // }
-      // else
-      // {
         if (fabsf(left->stateSpace.theta - 0.3f) < 0.1f && fabsf(right->stateSpace.theta - 0.3f) < 0.1f)
         {
           left->status.stand_count++;
