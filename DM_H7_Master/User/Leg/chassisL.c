@@ -54,6 +54,15 @@ void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t 
     object->stateSpace.ddtheta = Discreteness_Diff(&object->Discreteness.dTheta, object->stateSpace.dtheta, dt);
 }
 
+static inline float left_unwrap(float theta) {
+    return theta > PI ? theta - 2*PI : theta;
+}
+
+// 右摆: 原始范围[-3PI/2, PI/2) -> 连续递增[0, 2PI)
+static inline float right_unwrap(float theta) {
+    return theta < -PI/2 ? theta + 2*PI : theta;
+}
+
 float kl = 1.0f, kr = 1.0f;
 int16_t kl_count = 0, kr_count = 0;
 // 用于更新两腿之间的相对状态
@@ -86,6 +95,8 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
 
     slip_Check(Leg_l, Leg_r);
 
+    Leg_l->stateSpace.theta = left_unwrap(Leg_l->stateSpace.theta);
+    Leg_r->stateSpace.theta = right_unwrap(Leg_r->stateSpace.theta);
     // VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
     //               dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
     //               s,
