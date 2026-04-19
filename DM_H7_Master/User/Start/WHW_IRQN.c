@@ -141,21 +141,32 @@ void StartMonitorTask(void const * argument)
         //                     Leg_r.torque_send.T1,
         //                     0,
         //                     Leg_r.torque_send.T2);
-        BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
+        static uint8_t flag = 1;
+        if (flag == 1)
+        {
+            BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
                             Leg_r.torque_send.T1,
                             Leg_l.torque_send.T2,
                             Leg_r.torque_send.T2);
-        osDelay(1);
-        // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
-        if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0)
+            flag = -flag;
+        }
+        else
+        {
+            flag = -flag;
+        }
+
+        if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0) // 1khz
         {
             DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);   
         }
         
+        osDelay(1);
+        // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
+        
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
-        osDelay(1);
+        // osDelay(1);
     }
 }
 
