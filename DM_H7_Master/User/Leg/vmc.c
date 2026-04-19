@@ -196,7 +196,7 @@ float Vmc_get_Fs(float L0, vmc_Typedef *vmc)
     vmc->ls = sqrtf(l1 * l1 + s2 * s2 - 2.0f * l1 * s2 * cos(vmc->theta3 - vmc->alpha));
 
     vmc->Fv = Fs * (L0 * s2 * vmc->s3 * sin(vmc->theta3 - vmc->alpha) /
-               (vmc->ls * l1 * l2 * sin(vmc->theta3))) + 20.0f;
+               (vmc->ls * l1 * l2 * sin(vmc->theta3)));
 
     return vmc->Fv;
 }

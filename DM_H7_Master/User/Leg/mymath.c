@@ -37,6 +37,25 @@ float Discreteness_Diff(Discreteness_TypeDef *object, float input, float dt)
     return object->diff_num;
 }
 
+float Luenberger_Init(Luenberger_Typedef *object, float l1, float l2)
+{
+    object->l1 = l1;
+    object->l2 = l2;
+}
+
+float Luenberger_Calc(Luenberger_Typedef *object, float input, float dt)
+{
+    object->dt = dt;
+    object->x  = input;
+
+    object->x_hat += object->dt * object->v_hat + object->l1 * (object->x - object->x_hat) * object->dt;
+    object->v_hat += object->l2 * (object->x - object->x_hat) * object->dt;
+
+    return object->v_hat;
+}
+
+
+
 #define TUEQUE2NUM 2730.6666666666666666666666666667f
 void DJI_Torque_Control(hcan_t* hcan, uint16_t stdid, float t1, float t2, float t3, float t4)
 {

@@ -14,6 +14,18 @@ typedef struct
     float alpha;    // 滤波系数
 } Discreteness_TypeDef;
 
+typedef struct 
+{
+    float l1;
+    float l2;
+    float x;
+    float x_hat;
+    float v_hat;
+    float dt;
+}
+Luenberger_Typedef;
+
+
 void Discreteness_Init(Discreteness_TypeDef *object, float alpha);
 float Discreteness_Sum(Discreteness_TypeDef *object, float input, float dt);
 float Discreteness_Diff(Discreteness_TypeDef *object, float input, float dt);

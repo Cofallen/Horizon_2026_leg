@@ -85,10 +85,10 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->LQR.T_p = object->LQR.T_p - object->LQR.dF_delta;
     object->LQR.T_w = object->LQR.T_w - object->LQR.dF_yaw;
 
-    // 测试补偿
-    object->LQR.F_0 = - object->vmc_calc.Fv;
-    object->LQR.T_p = 0.0f;
-    
+    // // 测试补偿
+    // object->LQR.F_0 = - object->vmc_calc.Fv;
+    // object->LQR.T_p = 0.0f;
+
     object->LQR.torque_setT[0] = object->vmc_calc.JRM[0][0] * object->LQR.F_0 + \
                                  object->vmc_calc.JRM[0][1] * object->LQR.T_p;
     object->LQR.torque_setT[1] = object->vmc_calc.JRM[1][0] * object->LQR.F_0 + \
