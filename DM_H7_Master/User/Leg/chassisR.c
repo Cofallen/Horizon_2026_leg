@@ -15,16 +15,16 @@ float PID_P_RB[3] = {-10.0f, 0.0f, 10.0f};
 
 void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {   
-    ALL_MOTOR.right_front.DATA.pos_init_rad = -2.51055145f;
-    ALL_MOTOR.right_back.DATA.pos_init_rad  = -0.535742819f;
+    ALL_MOTOR.right_front.DATA.pos_init_rad = -0.345529169f;
+    ALL_MOTOR.right_back.DATA.pos_init_rad  = 3.57973599f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->right_front.PID_P, 6.0f, 0.1f, PID_P_RF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
-    PID_Init(&motor->right_front.PID_S, 3.0f, 0.1f, PID_S_RF,
+    PID_Init(&motor->right_front.PID_S, 9.0f, 0.1f, PID_S_RF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->right_back.PID_P, 6.0f, 0.1f, PID_P_RB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
-    PID_Init(&motor->right_back.PID_S, 3.0f, 0.1f, PID_S_RB,
+    PID_Init(&motor->right_back.PID_S, 9.0f, 0.1f, PID_S_RB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
 }
 
@@ -85,7 +85,10 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->LQR.T_p = object->LQR.T_p - object->LQR.dF_delta;
     object->LQR.T_w = object->LQR.T_w - object->LQR.dF_yaw;
 
-
+    // 测试补偿
+    object->LQR.F_0 = - object->vmc_calc.Fv;
+    object->LQR.T_p = 0.0f;
+    
     object->LQR.torque_setT[0] = object->vmc_calc.JRM[0][0] * object->LQR.F_0 + \
                                  object->vmc_calc.JRM[0][1] * object->LQR.T_p;
     object->LQR.torque_setT[1] = object->vmc_calc.JRM[1][0] * object->LQR.F_0 + \

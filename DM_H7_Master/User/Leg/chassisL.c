@@ -24,16 +24,16 @@ float outppp = 0;
 void ChassisL_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {
     // BM_EnableDisable()
-    ALL_MOTOR.left_front.DATA.pos_init_rad = 2.60776734f;
-    ALL_MOTOR.left_back.DATA.pos_init_rad  = -2.32398105f;   // 读取lr都应取负
+    ALL_MOTOR.left_front.DATA.pos_init_rad = 1.5084784f;
+    ALL_MOTOR.left_back.DATA.pos_init_rad  = -1.0643909;   // 读取lr都应取负
     ALL_MOTOR.left_wheel.DATA.Angle_Init   = ALL_MOTOR.left_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->left_front.PID_P, 10.0f, 0.1f, PID_P_LF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
-    PID_Init(&motor->left_front.PID_S, 3.0f, 0.1f, PID_S_LF,
+    PID_Init(&motor->left_front.PID_S, 9.0f, 0.1f, PID_S_LF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_Init(&motor->left_back.PID_P, 10.0f, 0.1f, PID_P_LB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
-    PID_Init(&motor->left_back.PID_S, 3.0f, 0.1f, PID_S_LB,
+    PID_Init(&motor->left_back.PID_S, 9.0f, 0.1f, PID_S_LB,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
     PID_init(&pid_follow, 0, PID_Follow_param, 2.0f, 0);
 
@@ -145,11 +145,15 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     // if (object->status.jump == 3 || object->status.jump == 4)
     //   object->LQR.F_0 = object->LQR.dF_0 + object->LQR.dF_roll; 
     // else 
-      object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 + object->LQR.dF_roll) - object->vmc_calc.Fv;
+      // object->LQR.F_0 = (MASS_BODY / 2.0f * 9.81f / arm_cos_f32(object->stateSpace.theta) + object->LQR.dF_0 + object->LQR.dF_roll) - object->vmc_calc.Fv;
     // object->LQR.F_0 = 0;
     // pid修正
     object->LQR.T_p = object->LQR.T_p + object->LQR.dF_delta;
     object->LQR.T_w = object->LQR.T_w + object->LQR.dF_yaw;
+
+    // 测试补偿
+    object->LQR.F_0 = - object->vmc_calc.Fv;
+    object->LQR.T_p = 0.0f;
 
     object->LQR.torque_setT[0] = object->vmc_calc.JRM[0][0] * object->LQR.F_0 + \
                                  object->vmc_calc.JRM[0][1] * object->LQR.T_p;
@@ -300,7 +304,7 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     // Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
 
     // 倒地自启
-    uint8_t is_fallen = (fabs(left->stateSpace.theta) >= 1.2f) || (fabs(right->stateSpace.theta) >= 1.2f);
+    uint8_t is_fallen = (fabs(left->stateSpace.theta) >= 1.0f) || (fabs(right->stateSpace.theta) >= 1.0f);
     // uint8_t is_fallen = (left->vmc_calc.L0[POS] >= 0.2f || right->vmc_calc.L0[POS] >= 0.2f) && (fabs(left->stateSpace.theta) >= 1.2f) || (fabs(right->stateSpace.theta) >= 1.2f);
     uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f) && ((left->stateSpace.theta > 0) && (right->stateSpace.theta > 0));
     // uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f);

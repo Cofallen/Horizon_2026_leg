@@ -110,10 +110,10 @@ void StartGimbalTask(void const *argument)
         ChassisL_UpdateState(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        Chassis_GetStatus(&Leg_l, &Leg_r);
+        // Chassis_GetStatus(&Leg_l, &Leg_r);
         if (Leg_l.status.step_flag || Leg_r.status.step_flag)
         {
-            Chassis_DownUp(&Leg_l, &Leg_r, &ALL_MOTOR, &WHW_V_DBUS);
+            // Chassis_DownUp(&Leg_l, &Leg_r, &ALL_MOTOR, &WHW_V_DBUS);
         }
         else
         {
@@ -155,10 +155,10 @@ void StartMonitorTask(void const * argument)
             flag = -flag;
         }
 
-        if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0) // 1khz
-        {
-            DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);   
-        }
+        // if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0) // 1khz
+        // {
+            // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);   
+        // }
         
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
