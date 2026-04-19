@@ -93,9 +93,9 @@ void Everying_Init(void)
     FDCAN1_Config();
     FDCAN2_Config();
     FDCAN3_Config();
-	// HAL_FDCAN_Start(&hfdcan1);
-	// HAL_FDCAN_Start(&hfdcan2);
-	// HAL_FDCAN_Start(&hfdcan3);
+	HAL_FDCAN_Start(&hfdcan1);
+	HAL_FDCAN_Start(&hfdcan2);
+	HAL_FDCAN_Start(&hfdcan3);
     //开启XT30 2+2 可控输出
     HAL_GPIO_WritePin(POWER_24V_2_GPIO_Port, POWER_24V_2_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(POWER_24V_1_GPIO_Port, POWER_24V_1_Pin, GPIO_PIN_SET);

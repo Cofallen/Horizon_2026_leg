@@ -88,7 +88,7 @@ void StartGimbalTask(void const *argument)
 {
     // BM_EnableDisable(&hfdcan1, 0x01);
     // BM_set_ID(&hfdcan1, 2, 1);
-    osDelay(100);
+    // osDelay(100);
     BM_EnableDisable(&hfdcan2, 0x02);
     // BM_save_flash(&hfdcan1);
     osDelay(10);
@@ -177,7 +177,7 @@ void StartK3debugTask(void const * argument)
     currentTimeK3debug = xTaskGetTickCount();
 
 	// k3debug_init(&ALL_MOTOR);
-	DM_test_init();
+	// DM_test_init();
 	
     for(;;)
     {
@@ -215,12 +215,12 @@ void StartK3debugTask(void const * argument)
         //                 Leg_r.pid.F0_l.Pout,
         //                 Leg_r.pid.F0_l.Iout,
         //                 Leg_r.pid.F0_l.Dout);   
-        Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
-                                          WHW_V_DBUS.Remote.CH3_int16,
-                                          WHW_V_DBUS.Remote.Dial_int16,
-                                          WHW_V_DBUS.Remote.S1_u8,
-                                          WHW_V_DBUS.Remote.S2_u8,
-                                          IMU_Data.pitch);
+        // Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
+        //                                   WHW_V_DBUS.Remote.CH3_int16,
+        //                                   WHW_V_DBUS.Remote.Dial_int16,
+        //                                   WHW_V_DBUS.Remote.S1_u8,
+        //                                   WHW_V_DBUS.Remote.S2_u8,
+        //                                   IMU_Data.pitch);
         VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
                         IMU_Data.yaw,
                         (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
