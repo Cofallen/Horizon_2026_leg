@@ -40,6 +40,17 @@ void Vmc_Init(Leg_Typedef *object, float target_l0)
     PID_init(&object->pid.Yaw, PID_POSITION, Yaw_control_P, 2.0f, 0.0f);
     PID_init(&object->pid.Delta, PID_POSITION, Delta_control_P, 10.0f, 0.2f);
     PID_init(&object->pid.Roll, PID_POSITION, Roll_control_P, 150.0f, 0.0f);
+
+    object->Luenberger.dS.l1 = 20.0f;
+    object->Luenberger.dS.l2 = 200.0f;
+    object->Luenberger.dTheta.l1 = 20.0f;
+    object->Luenberger.dTheta.l2 = 200.0f;
+    object->Luenberger.Phi.l1 = 20.0f;
+    object->Luenberger.Phi.l2 = 200.0f;
+    object->Luenberger.Theta.l1 = 20.0f;
+    object->Luenberger.Theta.l2 = 200.0f;
+    object->Luenberger.Theta_w.l1 = 20.0f;
+    object->Luenberger.Theta_w.l2 = 200.0f;
 }
 
 void Vmc_calcL(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t *imu, float dt)

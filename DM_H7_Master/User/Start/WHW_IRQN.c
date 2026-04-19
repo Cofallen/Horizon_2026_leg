@@ -221,10 +221,10 @@ void StartK3debugTask(void const * argument)
         //                                   WHW_V_DBUS.Remote.S1_u8,
         //                                   WHW_V_DBUS.Remote.S2_u8,
         //                                   IMU_Data.pitch);
-        VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
-                        IMU_Data.yaw,
-                        (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
-                        0,0,0,0,0,0,(float)Leg_l.status.offGround);
+        // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
+        //                 IMU_Data.yaw,
+        //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
+        //                 0,0,0,0,0,0,(float)Leg_l.status.offGround);
 
         // VOFA_justfloat_ML(Leg_l.LQR.F_0, Leg_l.LQR.T_p, 
         //                   Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta,

@@ -31,5 +31,7 @@ float Discreteness_Sum(Discreteness_TypeDef *object, float input, float dt);
 float Discreteness_Diff(Discreteness_TypeDef *object, float input, float dt);
 void DJI_Torque_Control(hcan_t* hcan, uint16_t stdid, float t1, float t2, float t3, float t4);
 float Lowpass_Filter(float *last_output, float input, float alpha);
+float Luenberger_Init(Luenberger_Typedef *object, float l1, float l2);
+float Luenberger_Calc(Luenberger_Typedef *object, float input, float dt);
 
 #endif // !__MYMATH_H

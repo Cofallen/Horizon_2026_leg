@@ -108,6 +108,15 @@ typedef struct
     
     struct 
     {
+        Luenberger_Typedef Theta;
+        Luenberger_Typedef dTheta;
+        Luenberger_Typedef Phi;
+        Luenberger_Typedef Theta_w;
+        Luenberger_Typedef dS;
+    }Luenberger;
+
+    struct 
+    {
         pid_type_def F0_l_p;
         pid_type_def F0_l_s;
         PID_t F0_l_x;
