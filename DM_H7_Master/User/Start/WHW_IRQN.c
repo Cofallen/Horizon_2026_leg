@@ -163,7 +163,7 @@ void StartMonitorTask(void const * argument)
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
         
-        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
+        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
         // osDelay(1);
