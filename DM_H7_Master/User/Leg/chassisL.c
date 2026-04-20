@@ -50,8 +50,8 @@ void ChassisL_UpdateState(Leg_Typedef *object, MOTOR_Typedef *motor, IMU_Data_t 
     // object->stateSpace.dphi = Discreteness_Diff(&object->Discreteness.Phi, object->stateSpace.phi, dt);
     object->stateSpace.dphi = -imu->gyro[0];   
 
-    VOFA_justfloat(-imu->gyro[0], imu->gyro[1], imu->gyro[2],
-                    a,b,0,0,0,0,0);
+    // VOFA_justfloat(-imu->gyro[0], imu->gyro[1], imu->gyro[2],
+    //                 a,b,0,0,0,0,0);
     object->stateSpace.ddtheta = Discreteness_Diff(&object->Discreteness.dTheta, object->stateSpace.dtheta, dt);
 }
 

@@ -88,7 +88,7 @@ void StartGimbalTask(void const *argument)
 {
     // BM_EnableDisable(&hfdcan1, 0x01);
     // BM_set_ID(&hfdcan1, 2, 1);
-    // osDelay(100);
+    osDelay(100);
     BM_EnableDisable(&hfdcan2, 0x02);
     // BM_save_flash(&hfdcan1);
     osDelay(10);
@@ -226,12 +226,12 @@ void StartK3debugTask(void const * argument)
         //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
         //                 0,0,0,0,0,0,(float)Leg_l.status.offGround);
 
-        // VOFA_justfloat_ML(Leg_l.LQR.F_0, Leg_l.LQR.T_p, 
-        //                   Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta,
-        //                   Leg_l.stateSpace.dtheta * Leg_l.stateSpace.dtheta, Leg_l.stateSpace.ddtheta,
-        //                   sin(Leg_l.stateSpace.theta), cos(Leg_l.stateSpace.theta),
-        //                   Leg_l.vmc_calc.L0[POS], Leg_l.vmc_calc.L0[VEL],
-        //                   Leg_l.vmc_calc.L0[ACC], IMU_Data.accel[2]);
+        VOFA_justfloat_ML(Leg_l.LQR.F_0, Leg_l.LQR.T_p, 
+                          Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta,
+                          Leg_l.stateSpace.dtheta * Leg_l.stateSpace.dtheta, Leg_l.stateSpace.ddtheta,
+                          sin(Leg_l.stateSpace.theta), cos(Leg_l.stateSpace.theta),
+                          Leg_l.vmc_calc.L0[POS], Leg_l.vmc_calc.L0[VEL],
+                          Leg_l.vmc_calc.L0[ACC], IMU_Data.accel[2]);
         
         osDelay(2);
     }
