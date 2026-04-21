@@ -1714,6 +1714,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Leg\get_target.c</FilePath>
             </File>
+            <File>
+              <FileName>KNN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\KNN.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

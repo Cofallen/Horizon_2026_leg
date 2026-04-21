@@ -178,7 +178,7 @@ static void getPhi(vmc_Typedef *vmc, float phi1, float phi4, float l1, float l2,
 static void getMatJRM(vmc_Typedef *vmc, float phi0, float phi1, float phi2, float phi3, float phi4, float L0, float l1, float l4);
 static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu);
 static float Vmc_getFnR(Leg_Typedef *object, IMU_Data_t *imu);
-uint8_t ground_check(Leg_Typedef *leg, IMU_Data_t *imu, float *w, float b, float *mean, float *std);
+// uint8_t ground_check(Leg_Typedef *leg, IMU_Data_t *imu, float *w, float b, float *mean, float *std);
 
 float Vmc_get_Fs(float L0, vmc_Typedef *vmc);
 

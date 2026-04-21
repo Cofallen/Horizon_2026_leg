@@ -10,6 +10,7 @@
 #include "observe.h"
 #include "board2board.h"
 #include "get_target.h"
+#include "KNN.h"
 
 // 均单环 P：磕台阶 S: 倒地自启
 float PID_S_LF[3] = {4.0f, 0.0f, 0.0f};
@@ -258,10 +259,10 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
 
 uint16_t cca = 0, ccb = 0;
 
-float w[] = {5.68080434, 6.51460719, 3.65925339, -1.11670843, 1.80365314, 0.33880197, 1.24988064, 1.66404497, -0.65706071};
-float b = -5.41238865;
-float mean[] = {-15.32931674, -22.34451875, -0.10069609, 0.00016334, 0.65412178, 0.39439554, -0.10131480, 0.92702659, 9.69873824};
-float std[] = {82.07077309, 27.26002326, 0.37895665, 0.80877794, 4.03278119, 183.15933416, 0.33971003, 0.12231956, 2.51354367};
+// float w[] = {8.23521264, 8.69834965, 1.78259253, 0.16771652, 1.07922558, 0.03220763, -0.53748833, 0.42575712, -0.58027362};
+// float b = -6.20173577;
+// float mean[] = {-30.41808307, -12.34488136, 0.00315275, -0.00464040, 1.35854588, -2.00639961, -0.01038345, 0.92982620, 9.67937703};
+// float std[] = {94.37885327, 19.92452379, 0.38786233, 1.16555753, 5.68133384, 239.56580740, 0.33913288, 0.14331179, 2.84528473};
 
 void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 {   
@@ -296,8 +297,10 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     // }
     
     // 离地状态
-    left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
-    right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
+    // left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
+    // right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
+    left->status.offGround = ground_check(&Leg_l, &IMU_Data);
+    right->status.offGround = ground_check(&Leg_r, &IMU_Data);
     
     // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
