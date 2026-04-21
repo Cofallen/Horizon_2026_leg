@@ -258,99 +258,53 @@ void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *rig
 
 uint16_t cca = 0, ccb = 0;
 
-float w[] = { -28.34938669, -11.98377804, -2.17986551, 1.24582719, -0.53433661, -0.74622627, -2.37520701, -7.69283337, -0.69299153, 0.76600141, -1.52070556, 0.37045245 };
-float b = 15.60211442;
-float mean[] = { 4.91989870, -1.52500986, -0.01762047, 0.00137789, 0.16068342, 0.73523494, -0.01592070, 0.97824851, 0.30693136, 0.00015242, 0.97611212, 9.68234208 };
-float std[] = { 72.77303549, 8.93511629, 0.20958454, 0.40085100, 0.68900020, 698.17346026, 0.20294189, 0.03988713, 0.09888232, 0.08829290, 187.76820550, 0.55401940 };
+float w[] = {1.69588025, 3.06555869, 0.54115548, -0.54426663, -0.59940420, 0.10438855, 0.71885968, 5.51700231, -9.63936330, 0.03552829, -0.03055458, -0.13626929};
+float b = 2.75425471;
+float mean[] = {-96.62461700, -19.99168170, -0.07726426, 0.00008256, 0.69081152, 0.78206030, -0.07559545, 0.94813048, 0.26647777, 0.00016267, 0.16435057, 9.57769587};
+float std[] = {391.48419182, 26.53828930, 0.33122839, 0.83115072, 4.19959262, 165.22137038, 0.27837740, 0.13359093, 0.06631345, 0.11682215, 41.86923506, 2.15543952};
 
 void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 {   
-    const uint32_t STEP_KEEP = 500;
-    static uint32_t step_count = 0;
+    // const uint32_t STEP_KEEP = 500;
+    // static uint32_t step_count = 0;
 
-    uint8_t trigger = (Leg_l.vmc_calc.L0[POS] >= 0.3f && Leg_l.stateSpace.theta > 0.3f)
-                    || (Leg_r.vmc_calc.L0[POS] >= 0.3f && Leg_r.stateSpace.theta > 0.3f);
+    // uint8_t trigger = (Leg_l.vmc_calc.L0[POS] >= 0.3f && Leg_l.stateSpace.theta > 0.3f)
+    //                 || (Leg_r.vmc_calc.L0[POS] >= 0.3f && Leg_r.stateSpace.theta > 0.3f);
 
-    if (!left->status.step_flag && trigger)
-    {
-        // 触发，进入保持状态并清零计数
-        left->status.step_flag = 1;
-        right->status.step_flag = 1;
-        step_count = 0;
-    }
-    else if (left->status.step_flag)
-    {
-        // 已在保持状态，计数增长；当触发消失或达到阈值时退出保持
-        step_count++;
-        if (!trigger || step_count >= STEP_KEEP)
-        {
-            left->status.step_flag = 0;
-            right->status.step_flag = 0;
-        }
-    }
-    else
-    {
-        // 未触发且未处于保持，保持为0
-        left->status.step_flag = 0;
-        right->status.step_flag = 0;
-    }
+    // if (!left->status.step_flag && trigger)
+    // {
+    //     // 触发，进入保持状态并清零计数
+    //     left->status.step_flag = 1;
+    //     right->status.step_flag = 1;
+    //     step_count = 0;
+    // }
+    // else if (left->status.step_flag)
+    // {
+    //     // 已在保持状态，计数增长；当触发消失或达到阈值时退出保持
+    //     step_count++;
+    //     if (!trigger || step_count >= STEP_KEEP)
+    //     {
+    //         left->status.step_flag = 0;
+    //         right->status.step_flag = 0;
+    //     }
+    // }
+    // else
+    // {
+    //     // 未触发且未处于保持，保持为0
+    //     left->status.step_flag = 0;
+    //     right->status.step_flag = 0;
+    // }
     
     // 离地状态
-    left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
-    right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
+    // left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
+    // right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
     
     // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
     // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
     // Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
 
-    // 倒地自启
-    uint8_t is_fallen = (fabs(left->stateSpace.theta) >= 1.0f) || (fabs(right->stateSpace.theta) >= 1.0f);
-    // uint8_t is_fallen = (left->vmc_calc.L0[POS] >= 0.2f || right->vmc_calc.L0[POS] >= 0.2f) && (fabs(left->stateSpace.theta) >= 1.2f) || (fabs(right->stateSpace.theta) >= 1.2f);
-    uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f) && ((left->stateSpace.theta > 0) && (right->stateSpace.theta > 0));
-    // uint8_t can_recover = (fabs(left->stateSpace.theta) < 1.3f) && (fabs(right->stateSpace.theta) < 1.3f);
-    // 使用 left->status.stand 作为整车的状态标志 (0:正常, 1:倒地, 2:恢复)
-    // if (fabsf(IMU_Data.pitch) > 60.0f || fabsf(IMU_Data.roll) > 60.0f)
-    // {
-    //   is_fallen = 1;
-    // }
     
-    switch (left->status.stand)
-    {
-    case 0:   // 正常状态
-      if (is_fallen)
-      {
-        left->status.stand = 1;
-        right->status.stand = 1;
-      }
-      break;
-    case 1:   // 倒地状态
-      if (can_recover)
-      {
-        left->status.stand = 2;
-        right->status.stand = 2;
-      }
-      // 否则保持倒地
-      break;
-    case 2:   // 恢复状态
-        if (fabsf(left->stateSpace.theta - 0.3f) < 0.1f && fabsf(right->stateSpace.theta - 0.3f) < 0.1f)
-        {
-          left->status.stand_count++;
-          right->status.stand_count++;
-        }
-      
-        if (left->status.stand_count >= 200 || right->status.stand_count >= 200)
-        {
-          left->status.stand_count = 0;
-          right->status.stand_count = 0;
-          left->status.stand = 0;
-          right->status.stand = 0;
-        }
-      // }
-      break;
-    default:
-      break;
-    }
 }
 
 float limitl = 4.0f, limitw = 2.0f;
@@ -395,48 +349,48 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
     }
 
 
-    if (machine_state == 1) // 倒地
-    {
-      Chassis_Rotate(&ALL_MOTOR);
-    }
-    else if (machine_state == 2) // 恢复
-    {
-      //  memcpy(left->LQR.K , ChassisL_LQR_K_stand, sizeof(ChassisL_LQR_K));
-      // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(ChassisR_LQR_K));
+    // if (machine_state == 1) // 倒地
+    // {
+    //   Chassis_Rotate(&ALL_MOTOR);
+    // }
+    // else if (machine_state == 2) // 恢复
+    // {
+    //   //  memcpy(left->LQR.K , ChassisL_LQR_K_stand, sizeof(ChassisL_LQR_K));
+    //   // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(ChassisR_LQR_K));
       
-      // 1. 收腿
-      left->target.l0 = MIN_LEG_LENGTH;
-      right->target.l0 = MIN_LEG_LENGTH;
-      // memcpy(left->LQR.K, ChassisL_LQR_K_stand, sizeof(float) * 12);
-      // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(float) * 12);
-      if (fabsf(left->stateSpace.theta) <= 0.3f || fabsf(right->stateSpace.theta ) <= 0.3f)
-      {
-        // left->limit.T_max = 0.0f;
-        // right->limit.T_max = 0.0f;
-        // left->limit.W_max = 1.0f;
-        // right->limit.W_max = 1.0f;
-      }
-      else
-      {
-        left->limit.T_max = limitl;
-        right->limit.T_max = limitl;
-        left->limit.W_max = limitw;
-        right->limit.W_max = limitw;
-      }
-      time++;
-      // 2. 轮电机摆动，髋关节失能
-      if (time >= 1000)
-      {
-        time = 0;
-      }
-    }
-    else // 正常
-    {
+    //   // 1. 收腿
+    //   left->target.l0 = MIN_LEG_LENGTH;
+    //   right->target.l0 = MIN_LEG_LENGTH;
+    //   // memcpy(left->LQR.K, ChassisL_LQR_K_stand, sizeof(float) * 12);
+    //   // memcpy(right->LQR.K, ChassisR_LQR_K_stand, sizeof(float) * 12);
+    //   if (fabsf(left->stateSpace.theta) <= 0.3f || fabsf(right->stateSpace.theta ) <= 0.3f)
+    //   {
+    //     // left->limit.T_max = 0.0f;
+    //     // right->limit.T_max = 0.0f;
+    //     // left->limit.W_max = 1.0f;
+    //     // right->limit.W_max = 1.0f;
+    //   }
+    //   else
+    //   {
+    //     left->limit.T_max = limitl;
+    //     right->limit.T_max = limitl;
+    //     left->limit.W_max = limitw;
+    //     right->limit.W_max = limitw;
+    //   }
+    //   time++;
+    //   // 2. 轮电机摆动，髋关节失能
+    //   if (time >= 1000)
+    //   {
+    //     time = 0;
+    //   }
+    // }
+    // else // 正常
+    // {
       left->limit.W_max = MAX_TORQUE_LEG_W;
       right->limit.W_max = MAX_TORQUE_LEG_W;
       left->limit.T_max = MAX_TORQUE_LEG_T;
       right->limit.T_max = MAX_TORQUE_LEG_T;
-    }
+    // }
 }
 
 // 获取目标值，使用规划
