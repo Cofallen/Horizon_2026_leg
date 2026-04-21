@@ -13,7 +13,7 @@
 
 #define RADIUS_WHEEL   0.06f
 #define MASS_WHEEL     0.572f         // +-   屁股0.117，加到轮上
-#define MASS_BODY     18.0f          // +-0.1
+#define MASS_BODY     12.0f          // +-0.1
 #define L1_LENGTH     0.215f
 #define L2_LENGTH     0.258f
 #define L3_LENGTH     0.258f
@@ -26,7 +26,7 @@
 
 #define MAX_TORQUE_LEG_T 25.0f
 #define MAX_TORQUE_LEG_W 8.0f
-#define MAX_LEG_LENGTH 0.345f
+#define MAX_LEG_LENGTH 0.30f
 #define MIN_LEG_LENGTH 0.16f
 
 #define REDUCTION_RATIO 15.764705882352941176470588235294f   // 268/17
