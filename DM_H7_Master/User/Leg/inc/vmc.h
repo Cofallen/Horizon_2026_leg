@@ -52,6 +52,7 @@ typedef struct
     float phi3[3];
     float phi4[3];
     float JRM[2][2];            // 雅可比矩阵
+    float JRM_inv[2][2];
     float alpha;                // 气弹簧解算对应角
     float ls;                   // 气弹簧解算对应长度
     float Fv;                   // 气弹簧等效作用支持力
@@ -149,6 +150,8 @@ typedef struct
         float Fn;               // 轮子支持力，用于离地检测
         float torque_setT[2];
         float torque_setW;
+        float torque_get_F_0;
+        float torque_get_T_p;
     }LQR;
     
     struct 

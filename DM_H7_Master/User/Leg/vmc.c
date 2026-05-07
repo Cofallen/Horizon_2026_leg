@@ -130,6 +130,11 @@ static void getMatJRM(vmc_Typedef *vmc, float phi0, float phi1, float phi2, floa
     vmc->JRM[0][1] = -l1 * arm_sin_f32(phi1 - phi2) * arm_cos_f32(phi0 - phi3) / (L0 * arm_sin_f32(phi2 - phi3));
     vmc->JRM[1][0] = -l4 * arm_sin_f32(phi0 - phi2) * arm_sin_f32(phi3 - phi4) / arm_sin_f32(phi2 - phi3);
     vmc->JRM[1][1] = -l4 * arm_sin_f32(phi3 - phi4) * arm_cos_f32(phi0 - phi2) / (L0 * arm_sin_f32(phi2 - phi3));
+
+    vmc->JRM_inv[0][0] = -arm_cos_f32(phi0 - phi2) / (l1 * arm_sin_f32(phi1 - phi2));
+    vmc->JRM_inv[0][1] =  arm_cos_f32(phi0 - phi3) / (l4 * arm_sin_f32(phi3 - phi4));
+    vmc->JRM_inv[1][0] =  L0 * arm_sin_f32(phi0 - phi2) / (l1 * arm_sin_f32(phi1 - phi2));
+    vmc->JRM_inv[1][1] = -L0 * arm_sin_f32(phi0 - phi3) / (l4 * arm_sin_f32(phi3 - phi4));
 }
 
 static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu)
@@ -139,7 +144,7 @@ static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu)
     ddl_fL = Lowpass_Filter(&ddl_fL, object->vmc_calc.L0[ACC], 1.0f);
     acc_fL = Lowpass_Filter(&acc_fL, imu->accel[2], 1.0f);
 
-    P = object->LQR.F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
+    P = object->LQR.torque_get_F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fL - 9.81f) - ddl_fL * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
             object->vmc_calc.L0[POS] * arm_sin_f32(object->stateSpace.theta) * ddtheta_fL + object->vmc_calc.L0[POS] * object->stateSpace.dtheta * object->stateSpace.dtheta * arm_cos_f32(object->stateSpace.theta);
     object->LQR.Fn = P + MASS_WHEEL * 9.81f + MASS_WHEEL * ddz_w;
@@ -152,7 +157,7 @@ static float Vmc_getFnR(Leg_Typedef *object, IMU_Data_t *imu)
     ddl_fR = Lowpass_Filter(&ddl_fR, object->vmc_calc.L0[ACC], 1.0f);
     acc_fR = Lowpass_Filter(&acc_fR, imu->accel[2], 1.0f);
 
-    P = object->LQR.F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
+    P = object->LQR.torque_get_F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fR - 9.81f) - ddl_fR * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
             object->vmc_calc.L0[POS] * arm_sin_f32(object->stateSpace.theta) * ddtheta_fR + object->vmc_calc.L0[POS] * object->stateSpace.dtheta * object->stateSpace.dtheta * arm_cos_f32(object->stateSpace.theta);
     object->LQR.Fn = P + MASS_WHEEL * 9.81f + MASS_WHEEL * ddz_w;
