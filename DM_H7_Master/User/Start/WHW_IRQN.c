@@ -64,6 +64,7 @@ void StartRobotUITask(void const *argument)
 	
     for(;;)
     {
+        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 		osDelay(1);
         // vTaskDelayUntil(&currentTimeRobotUI, 1);
     }
@@ -137,27 +138,14 @@ void StartMonitorTask(void const * argument)
     for(;;)
     {
         // BM_Send_torque(&hfdcan2, 0x032, 0,0,0,0);
-        // BM_Send_torque(&hfdcan2, 0x032, 0, 
-        //                     Leg_r.torque_send.T1,
-        //                     0,
-        //                     Leg_r.torque_send.T2);
         BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
                             Leg_r.torque_send.T1,
                             Leg_l.torque_send.T2,
                             Leg_r.torque_send.T2);
-
-        // if (Leg_l.status.offGround == 0 || Leg_r.status.offGround == 0) // 1khz
-        // {
-            // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);   
-        // }
         
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
-        
-        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
-
-        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
-        // osDelay(1);
+        // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
     }
 }
 
@@ -212,10 +200,10 @@ void StartK3debugTask(void const * argument)
         //                                   WHW_V_DBUS.Remote.S1_u8,
         //                                   WHW_V_DBUS.Remote.S2_u8,
         //                                   IMU_Data.pitch);
-        VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
-                        IMU_Data.yaw,
-                        (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
-                        0,0,0,0,0,0,(float)Leg_l.status.offGround);
+        // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
+        //                 IMU_Data.yaw,
+        //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
+        //                 0,0,0,0,0,0,(float)Leg_l.status.offGround);
 
         // VOFA_justfloat_ML(Leg_l.LQR.F_0 + Leg_l.vmc_calc.Fv, Leg_l.LQR.T_p, 
         //                   Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta,
@@ -229,6 +217,16 @@ void StartK3debugTask(void const * argument)
         //                   sin(Leg_l.stateSpace.theta), cos(Leg_l.stateSpace.theta),
         //                   IMU_Data.accel[2],0,0,0 );
         
+        VOFA_justfloat(ALL_MOTOR.left_front.DATA.IQ, 
+                       ALL_MOTOR.left_front.DATA.voltage,
+                       ALL_MOTOR.left_back.DATA.IQ, 
+                       ALL_MOTOR.left_back.DATA.voltage,
+                       ALL_MOTOR.right_front.DATA.IQ, 
+                       ALL_MOTOR.right_front.DATA.voltage,
+                        ALL_MOTOR.right_back.DATA.IQ, 
+                       ALL_MOTOR.right_back.DATA.voltage,
+                    0,0);
+
         osDelay(2);
     }
 }

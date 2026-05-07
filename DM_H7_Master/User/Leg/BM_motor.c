@@ -74,7 +74,7 @@ void BM_Parse_drive(BM_motor_data_t *motor_data, uint8_t *rx_data)
     motor_data->pos_con = motor_data->round * 32768 + (float)motor_data->pos_raw[0];
 
     motor_data->vel_rad = -motor_data->vel * 0.10471975511965976666666666666667f; // *pi/30
-    motor_data->pos_rad = -(float)motor_data->pos_con * 0.00019174759848570513916015625f + motor_data->pos_init_rad; // *pi/32768
+    motor_data->pos_rad = -(float)motor_data->pos_con * 0.00019174759848570513916015625f - motor_data->pos_init_rad; // *pi/32768
     // motor_data->pos_init_rad = -(float)motor_data->pos_init * 0.00019174759848570513916015625f; // *pi/32768
 }
 
