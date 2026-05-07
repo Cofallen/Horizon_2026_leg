@@ -15,8 +15,8 @@ float PID_P_RB[3] = {-10.0f, 0.0f, 10.0f};
 
 void ChassisR_Init(MOTOR_Typedef *motor, Leg_Typedef *object)
 {   
-    ALL_MOTOR.right_front.DATA.pos_init_rad = 0.34744665;
-    ALL_MOTOR.right_back.DATA.pos_init_rad  = 2.70747614;
+    ALL_MOTOR.right_front.DATA.pos_init_rad = 0.447538912f;
+    ALL_MOTOR.right_back.DATA.pos_init_rad  = -2.86950278f;
     ALL_MOTOR.right_wheel.DATA.Angle_Init = ALL_MOTOR.right_wheel.DATA.Angle_Infinite;
     PID_Init(&motor->right_front.PID_P, 6.0f, 0.1f, PID_P_RF,
               0.0f, 0.0f, 0.0f, 0.0f, 0, 0);
@@ -96,7 +96,7 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->LQR.torque_setW  = object->LQR.T_w * kr;
 
     object->LQR.torque_get_F_0 =  (object->vmc_calc.JRM_inv[0][0] * ALL_MOTOR.left_front.DATA.IQ + \
-                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ);
+                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ) + object->vmc_calc.Fv;
     object->LQR.torque_get_T_p =   object->vmc_calc.JRM_inv[1][0] * ALL_MOTOR.left_front.DATA.IQ + \
                                    object->vmc_calc.JRM_inv[1][1] * ALL_MOTOR.left_back.DATA.IQ;
 

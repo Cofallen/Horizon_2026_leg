@@ -217,15 +217,25 @@ void StartK3debugTask(void const * argument)
         //                   sin(Leg_l.stateSpace.theta), cos(Leg_l.stateSpace.theta),
         //                   IMU_Data.accel[2],0,0,0 );
         
-        VOFA_justfloat(ALL_MOTOR.left_front.DATA.IQ, 
-                       ALL_MOTOR.left_front.DATA.voltage,
-                       ALL_MOTOR.left_back.DATA.IQ, 
-                       ALL_MOTOR.left_back.DATA.voltage,
-                       ALL_MOTOR.right_front.DATA.IQ, 
-                       ALL_MOTOR.right_front.DATA.voltage,
-                        ALL_MOTOR.right_back.DATA.IQ, 
-                       ALL_MOTOR.right_back.DATA.voltage,
-                    0,0);
+        // VOFA_justfloat(ALL_MOTOR.left_front.DATA.IQ, 
+        //                ALL_MOTOR.left_front.DATA.voltage,
+        //                ALL_MOTOR.left_back.DATA.IQ, 
+        //                ALL_MOTOR.left_back.DATA.voltage,
+        //                ALL_MOTOR.right_front.DATA.IQ, 
+        //                ALL_MOTOR.right_front.DATA.voltage,
+        //                 ALL_MOTOR.right_back.DATA.IQ, 
+        //                ALL_MOTOR.right_back.DATA.voltage,
+        //             Leg_l.LQR.Fn,Leg_r.LQR.Fn);
+        
+        VOFA_justfloat(Leg_l.LQR.F_0, 
+                       Leg_l.LQR.torque_get_F_0,
+                       Leg_l.vmc_calc.Fv, 
+                       Leg_r.LQR.F_0,
+                       Leg_r.LQR.torque_get_F_0, 
+                       Leg_r.vmc_calc.Fv,
+                        0, 
+                       0,
+                    Leg_l.LQR.Fn,Leg_r.LQR.Fn);
 
         osDelay(2);
     }
