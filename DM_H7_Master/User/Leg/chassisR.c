@@ -96,7 +96,7 @@ void ChassisR_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->LQR.torque_setW  = object->LQR.T_w * kr;
 
     object->LQR.torque_get_F_0 =  (object->vmc_calc.JRM_inv[0][0] * ALL_MOTOR.left_front.DATA.IQ + \
-                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ) + object->vmc_calc.Fv;
+                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ);
     object->LQR.torque_get_T_p =   object->vmc_calc.JRM_inv[1][0] * ALL_MOTOR.left_front.DATA.IQ + \
                                    object->vmc_calc.JRM_inv[1][1] * ALL_MOTOR.left_back.DATA.IQ;
 

@@ -143,9 +143,9 @@ static float Vmc_getFnL(Leg_Typedef *object, IMU_Data_t *imu)
     static float ddl_fL, ddtheta_fL, acc_fL; 
     ddl_fL = Lowpass_Filter(&ddl_fL, object->vmc_calc.L0[ACC], 0.1f);
     acc_fL = Lowpass_Filter(&acc_fL, imu->accel[2], 0.8f);
-    ddtheta_fL = Lowpass_Filter(&object->stateSpace.ddtheta, imu->accel[2], 0.8f);
+    ddtheta_fL = Lowpass_Filter(&object->stateSpace.ddtheta, object->stateSpace.ddtheta, 0.1f);
 
-    P = (object->LQR.torque_get_F_0) * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
+    P = (object->LQR.torque_get_F_0 + object->vmc_calc.Fv) * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fL - 9.81f) - ddl_fL * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
             object->vmc_calc.L0[POS] * arm_sin_f32(object->stateSpace.theta) * ddtheta_fL + object->vmc_calc.L0[POS] * object->stateSpace.dtheta * object->stateSpace.dtheta * arm_cos_f32(object->stateSpace.theta);
     object->LQR.Fn = P + MASS_WHEEL * 9.81f + MASS_WHEEL * ddz_w;
@@ -157,12 +157,12 @@ static float Vmc_getFnR(Leg_Typedef *object, IMU_Data_t *imu)
     static float ddl_fR, ddtheta_fR, acc_fR; 
     ddl_fR = Lowpass_Filter(&ddl_fR, object->vmc_calc.L0[ACC], 0.1f);
     acc_fR = Lowpass_Filter(&acc_fR, imu->accel[2], 0.8f);
-    ddtheta_fR = Lowpass_Filter(&object->stateSpace.ddtheta, imu->accel[2], 0.8f);
+    ddtheta_fR = Lowpass_Filter(&object->stateSpace.ddtheta, object->stateSpace.ddtheta, 0.1f);
 
-    P = object->LQR.torque_get_F_0 * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
+   P = (object->LQR.torque_get_F_0 + object->vmc_calc.Fv) * arm_cos_f32(object->stateSpace.theta) + object->LQR.torque_get_T_p * arm_sin_f32(object->stateSpace.theta) / object->vmc_calc.L0[POS];
     ddz_w = (acc_fR - 9.81f) - ddl_fR * arm_cos_f32(object->stateSpace.theta) + 2.0f * object->vmc_calc.L0[VEL] * object->stateSpace.dtheta * arm_sin_f32(object->stateSpace.theta) + \
             object->vmc_calc.L0[POS] * arm_sin_f32(object->stateSpace.theta) * ddtheta_fR + object->vmc_calc.L0[POS] * object->stateSpace.dtheta * object->stateSpace.dtheta * arm_cos_f32(object->stateSpace.theta);
-    object->LQR.Fn = P + MASS_WHEEL * 9.81f + MASS_WHEEL * ddz_w;
+     object->LQR.Fn = P + MASS_WHEEL * 9.81f + MASS_WHEEL * ddz_w;
 }
 
 #include "VOFA.h"

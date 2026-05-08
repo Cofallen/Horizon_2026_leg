@@ -164,7 +164,7 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     object->LQR.torque_setW  = object->LQR.T_w * kl;
 
     object->LQR.torque_get_F_0 = -(object->vmc_calc.JRM_inv[0][0] * ALL_MOTOR.left_front.DATA.IQ + \
-                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ) + object->vmc_calc.Fv;
+                                   object->vmc_calc.JRM_inv[0][1] * ALL_MOTOR.left_back.DATA.IQ);
     object->LQR.torque_get_T_p =   object->vmc_calc.JRM_inv[1][0] * ALL_MOTOR.left_front.DATA.IQ + \
                                    object->vmc_calc.JRM_inv[1][1] * ALL_MOTOR.left_back.DATA.IQ;
 
@@ -304,9 +304,33 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
     // 离地状态
     // left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
     // right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
-    left->status.offGround = ground_check(&Leg_l, &IMU_Data);
-    right->status.offGround = ground_check(&Leg_r, &IMU_Data);
-    
+    // left->status.offGround = ground_check(&Leg_l, &IMU_Data);
+    // right->status.offGround = ground_check(&Leg_r, &IMU_Data);
+    if (fabsf(Leg_l.LQR.Fn) < 20.0f) {
+      cca++;
+      if (cca >= 100)
+      {
+        Leg_l.status.offGround = 1;
+        cca = 0;
+      }
+    }
+    else {
+      Leg_l.status.offGround = 0;
+      cca = 0;
+    }
+
+    if (fabsf(Leg_r.LQR.Fn) < 20.0f) {
+      ccb++;
+      if (ccb >= 100)
+      {
+        Leg_r.status.offGround = 1;
+        ccb = 0;
+      }
+    }
+    else {
+      Leg_r.status.offGround = 0;
+      ccb = 0;
+    }
     // memcpy(left->LQR.K, ChassisL_LQR_K, sizeof(float) * 12);
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(float) * 12);
     // Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
@@ -329,32 +353,32 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
     // memcpy(right->LQR.K, ChassisR_LQR_K, sizeof(ChassisR_LQR_K));
 
     // 离地检测
-    // if (left->status.offGround == 1)
-    // {
-    //   left->LQR.K[0] = 0;
-    //   left->LQR.K[1] = 0;
-    //   left->LQR.K[2] = 0;
-    //   left->LQR.K[3] = 0;
-    //   left->LQR.K[4] = 0;
-    //   left->LQR.K[5] = 0;
-    //   left->LQR.K[8] = 0;
-    //   left->LQR.K[9] = 0;
-    //   left->LQR.K[10] = 0;
-    //   left->LQR.K[11] = 0;
-    // }
-    // if (right->status.offGround == 1)
-    // {
-    //   right->LQR.K[0] = 0;
-    //   right->LQR.K[1] = 0;
-    //   right->LQR.K[2] = 0;
-    //   right->LQR.K[3] = 0;
-    //   right->LQR.K[4] = 0;
-    //   right->LQR.K[5] = 0;
-    //   right->LQR.K[8] = 0;
-    //   right->LQR.K[9] = 0;
-    //   right->LQR.K[10] = 0;
-    //   right->LQR.K[11] = 0;
-    // }
+    if (left->status.offGround == 1)
+    {
+      left->LQR.K[0] = 0;
+      left->LQR.K[1] = 0;
+      left->LQR.K[2] = 0;
+      left->LQR.K[3] = 0;
+      left->LQR.K[4] = 0;
+      left->LQR.K[5] = 0;
+      left->LQR.K[8] = 0;
+      left->LQR.K[9] = 0;
+      left->LQR.K[10] = 0;
+      left->LQR.K[11] = 0;
+    }
+    if (right->status.offGround == 1)
+    {
+      right->LQR.K[0] = 0;
+      right->LQR.K[1] = 0;
+      right->LQR.K[2] = 0;
+      right->LQR.K[3] = 0;
+      right->LQR.K[4] = 0;
+      right->LQR.K[5] = 0;
+      right->LQR.K[8] = 0;
+      right->LQR.K[9] = 0;
+      right->LQR.K[10] = 0;
+      right->LQR.K[11] = 0;
+    }
 
 
     // if (machine_state == 1) // 倒地
