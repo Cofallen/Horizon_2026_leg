@@ -40,7 +40,7 @@ def get_k(leg_length):
     l_val = 0.028
     m_w_val = 0.572
     m_p_val = 0.9810
-    M_val = 18.0 / 2.0
+    M_val = 12.0 / 2.0
     I_w_val = 0.5 * m_w_val * R_val**2
     # I_p_val = m_p_val * ((leg_length)**2 + 0.12**2) / 12.0
     # I_M_val = M_val * (0.24**2 + 0.22**2) / 12.0
@@ -120,8 +120,8 @@ def get_k(leg_length):
     B_num = np.array(B_sym.subs(eq_point)).astype(np.float64)
 
     # 8. LQR 求解
-    Q = np.diag([20000, 10, 3000, 10, 50000, 20])
-    R_mat = np.diag([50, 20])  
+    Q = np.diag([40000, 100, 2000, 100, 80000, 500])
+    R_mat = np.diag([40, 1])  
     try:
         P_sol = scipy.linalg.solve_continuous_are(A_num, B_num, Q, R_mat)
         K = np.linalg.inv(R_mat) @ B_num.T @ P_sol

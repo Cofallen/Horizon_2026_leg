@@ -65,7 +65,6 @@ void StartRobotUITask(void const *argument)
 	
     for(;;)
     {
-        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
 		osDelay(1);
         // vTaskDelayUntil(&currentTimeRobotUI, 1);
     }
@@ -139,6 +138,7 @@ void StartMonitorTask(void const * argument)
                             Leg_r.torque_send.T1,
                             Leg_l.torque_send.T2,
                             Leg_r.torque_send.T2);
+        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
         
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
@@ -224,16 +224,21 @@ void StartK3debugTask(void const * argument)
         //                ALL_MOTOR.right_back.DATA.voltage,
         //             Leg_l.LQR.Fn,Leg_r.LQR.Fn);
         
-        VOFA_justfloat(Leg_l.LQR.F_0, 
-                       Leg_l.LQR.torque_get_F_0,
-                       Leg_l.vmc_calc.Fv, 
-                       Leg_r.LQR.F_0,
-                       Leg_r.LQR.torque_get_F_0, 
-                       Leg_r.vmc_calc.Fv,
-                        0, 
-                       0,
-                    Leg_l.LQR.Fn,Leg_r.LQR.Fn);
-
+        // VOFA_justfloat(Leg_l.LQR.F_0, 
+        //                Leg_l.LQR.torque_get_F_0,
+        //                Leg_l.vmc_calc.Fv, 
+        //                Leg_r.LQR.F_0,
+        //                Leg_r.LQR.torque_get_F_0, 
+        //                Leg_r.vmc_calc.Fv,
+        //                 0, 
+        //                0,
+        //             Leg_l.LQR.Fn,Leg_r.LQR.Fn);
+        
+        VOFA_justfloat(Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta, 
+                        Leg_l.stateSpace.s, Leg_l.stateSpace.dot_s,
+                        Leg_l.stateSpace.phi, Leg_l.stateSpace.dphi
+                        ,IMU_Data.accel[0],IMU_Data.accel[1],IMU_Data.accel[2],0);
+                        
         osDelay(2);
     }
 }

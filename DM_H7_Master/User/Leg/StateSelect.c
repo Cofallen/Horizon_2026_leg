@@ -112,20 +112,27 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 
         break;
 
-        case STATE_RISING:
+        case STATE_RISING:  // 作为倾斜车身
+        
+            // ---------- 起立失败 ----------
+            if(fabsf(theta_avg) > 1.45f)
+            {
+                left->status.robot_state = STATE_FALLEN;
+                right->status.robot_state = STATE_FALLEN;
 
-            if(fabsf(left->stateSpace.theta) < 1.2f &&
-               fabsf(right->stateSpace.theta) < 1.2f)
+                left->status.rising_count = 0;
+                break;
+            }
+
+            // ---------- 起立成功 ----------
+            if(fabsf(theta_avg) < 1.1f)
             {
                 left->status.rising_count++;
 
-                if(left->status.rising_count > 500)
+                if(left->status.rising_count > 50)
                 {
-                    left->status.robot_state =
-                        STATE_BALANCE;
-
-                    right->status.robot_state =
-                        STATE_BALANCE;
+                    left->status.robot_state = STATE_BALANCE;
+                    right->status.robot_state = STATE_BALANCE;
 
                     left->status.rising_count = 0;
                 }
@@ -231,8 +238,8 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
 
         case STATE_RISING:
 
-            left->limit.T_max = 10.0f;
-            right->limit.T_max = 10.0f;
+            left->limit.T_max = 8.0f;
+            right->limit.T_max = 8.0f;
 
             left->limit.W_max = 1.0f;
             right->limit.W_max = 1.0f;
