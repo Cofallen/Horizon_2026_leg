@@ -92,16 +92,14 @@ void StartGimbalTask(void const *argument)
     osDelay(100);
     BM_EnableDisable(&hfdcan2, 0x02);
     // BM_save_flash(&hfdcan1);
-    osDelay(10);
     ChassisL_Init(&ALL_MOTOR, &Leg_l);
     ChassisR_Init(&ALL_MOTOR, &Leg_r);
-    Vmc_Init(&Leg_l, 0.18);
-    Vmc_Init(&Leg_r, 0.18);
+    Vmc_Init(&Leg_l, MIN_LEG_LENGTH);
+    Vmc_Init(&Leg_r, MIN_LEG_LENGTH);
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
     }
-    osDelay(1000); // 等待IMU数据稳定
     xvEstimateKF_Init(&vaEstimateKF, 0.001f);
     for(;;)
     {

@@ -146,15 +146,6 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 
         case STATE_TRANSITION:  // 限幅防止速度过快，起立过度2
 
-            // 再次摔倒
-            // if(fabsf(theta_avg) > 1.4f)
-            // {
-            //     left->status.robot_state = STATE_FALLEN;
-            //     right->status.robot_state = STATE_FALLEN;
-
-            //     break;
-            // }
-
             left->status.transition_count++;
 
             if(left->status.transition_count > 300)
@@ -317,8 +308,8 @@ void Chassis_ControlSelect(MOTOR_Typedef *motor,
             // LQR直接限幅起立（你说的正确方案）
             Chassis_Fit_K(ChassisL_LQR_K_rising, left->vmc_calc.L0[POS], left->LQR.K);
             Chassis_Fit_K(ChassisR_LQR_K_rising, right->vmc_calc.L0[POS], right->LQR.K);
-            left->target.l0  = 0.15f;
-            right->target.l0 = 0.15f;
+            left->target.l0  = MIN_LEG_LENGTH;
+            right->target.l0 = MIN_LEG_LENGTH;
             ChassisL_Control(left, dbus, &IMU_Data, dt);
             ChassisR_Control(right, dbus, &IMU_Data, dt);
 

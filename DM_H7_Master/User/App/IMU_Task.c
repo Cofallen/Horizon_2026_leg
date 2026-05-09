@@ -50,7 +50,7 @@
 
 #include "IMU_Task.h"
 
-#define correct_Time_define 3000    //上电去0飘 1000次取平均
+#define correct_Time_define 1000    //上电去0飘 1000次取平均
 #define temp_times 300       //探测温度阈值
 #define Destination_TEMPERATURE 40.5f
 
