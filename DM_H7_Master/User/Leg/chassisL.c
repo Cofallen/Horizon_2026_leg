@@ -11,6 +11,7 @@
 #include "board2board.h"
 #include "get_target.h"
 #include "KNN.h"
+#include "legRotate.h"
 
 // 均单环 P：磕台阶 S: 倒地自启
 float PID_S_LF[3] = {4.0f, 0.0f, 0.0f};
@@ -99,6 +100,7 @@ void Chassis_UpdateStateS(Leg_Typedef *Leg_l, Leg_Typedef *Leg_r, MOTOR_Typedef 
 
     Leg_l->stateSpace.theta = left_unwrap(Leg_l->stateSpace.theta);
     Leg_r->stateSpace.theta = right_unwrap(Leg_r->stateSpace.theta);
+    LegRotate_UpdateTheta(Leg_l, Leg_r);
     // VOFA_justfloat(RUI_V_CONTAL.DWT_TIME.Move_Dtime,
     //               dot_s, Leg_l->stateSpace.dot_s, Leg_r->stateSpace.dot_s,
     //               s,

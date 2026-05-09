@@ -217,6 +217,7 @@ virtualFolder:
         - path: ../User/Leg/get_target.c
         - path: ../User/Leg/KNN.c
         - path: ../User/Leg/StateSelect.c
+        - path: ../User/Leg/legRotate.c
       folders: []
 dependenceList: []
 outDir: build

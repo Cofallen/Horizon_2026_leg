@@ -1724,6 +1724,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Leg\StateSelect.c</FilePath>
             </File>
+            <File>
+              <FileName>legRotate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\legRotate.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

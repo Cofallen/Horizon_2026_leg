@@ -13,6 +13,7 @@
 #include "board2board.h"
 #include "get_target.h"
 #include "KNN.h"
+#include "legRotate.h"
 
 // float w[] = {8.23521264, 8.69834965, 1.78259253, 0.16771652, 1.07922558, 0.03220763, -0.53748833, 0.42575712, -0.58027362};
 // float b = -6.20173577;
@@ -65,8 +66,8 @@ void Robot_UpdateMode(Leg_Typedef *left,
         0.5f *
         (left->vmc_calc.L0[POS] +
          right->vmc_calc.L0[POS]);
-    VOFA_justfloat(theta_l, theta_r, theta_avg, theta_diff, theta_max, pitch, pitch_rate,  L0_avg,
-                        0, RobotManager.mode);
+    // VOFA_justfloat(theta_l, theta_r, theta_avg, theta_diff, theta_max, pitch, pitch_rate,  L0_avg,
+    //                     0, RobotManager.mode);
     if(dbus->Remote.S2_u8 == 1)
     {
         RobotManager.mode = ROBOT_DISABLE;
@@ -97,6 +98,8 @@ void Robot_UpdateMode(Leg_Typedef *left,
 
                 if(RobotManager.fallen_count > 1)
                 {
+                    LegRotate_Reset();      // 设定轨迹初始
+
                     RobotManager.mode = ROBOT_FALLEN;
 
                     RobotManager.fallen_count = 0;
@@ -128,7 +131,7 @@ void Robot_UpdateMode(Leg_Typedef *left,
         break;
 
         case ROBOT_FALLEN:
-
+            
             if(theta_diff < 0.40f &&
                theta_max  > 1.00f &&
                theta_max  < 1.35f)
@@ -247,16 +250,12 @@ void Robot_Control(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *right, 
 
         case ROBOT_FALLEN:
 
-            left->LQR.torque_setT[0] = motor->left_front.PID_S.Output;
+            // LegRotate_UpdateTheta(left, right);
 
-            left->LQR.torque_setT[1] = motor->left_back.PID_S.Output;
-
-            right->LQR.torque_setT[0] = motor->right_front.PID_S.Output;
-
-            right->LQR.torque_setT[1] = motor->right_back.PID_S.Output;
-
-            left->LQR.torque_setW = 0.0f;
-            right->LQR.torque_setW = 0.0f;
+            LegRotate_Control(motor,
+                            left,
+                            right,
+                            dt);
 
         break;
 

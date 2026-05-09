@@ -96,6 +96,7 @@ void StartGimbalTask(void const *argument)
     ChassisR_Init(&ALL_MOTOR, &Leg_r);
     Vmc_Init(&Leg_l, MIN_LEG_LENGTH);
     Vmc_Init(&Leg_r, MIN_LEG_LENGTH);
+    LegRotate_Init();
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
