@@ -129,7 +129,7 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
             {
                 left->status.rising_count++;
 
-                if(left->status.rising_count > 50)
+                if(left->status.rising_count > 10)
                 {
                     left->status.robot_state = STATE_BALANCE;
                     right->status.robot_state = STATE_BALANCE;
