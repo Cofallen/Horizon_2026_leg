@@ -216,6 +216,7 @@ virtualFolder:
         - path: ../User/Leg/board2board.c
         - path: ../User/Leg/get_target.c
         - path: ../User/Leg/KNN.c
+        - path: ../User/Leg/StateSelect.c
       folders: []
 dependenceList: []
 outDir: build

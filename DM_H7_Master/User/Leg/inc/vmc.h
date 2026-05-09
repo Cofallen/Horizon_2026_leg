@@ -131,9 +131,16 @@ typedef struct
         uint8_t offGround;
         uint8_t jump;
         uint8_t stand;
-        uint16_t stand_count;   // 延迟起立lqr时间
-        uint8_t step_flag;      // 磕台阶
+        uint16_t stand_count;
+        uint8_t step_flag;
         uint8_t err[2];
+
+        uint8_t robot_state;
+
+        uint16_t fallen_count;
+        uint16_t rising_count;
+        uint16_t step_count;
+
     }status;
 
     struct 
@@ -170,6 +177,14 @@ typedef struct
     
 }Leg_Typedef;
 
+typedef enum
+{
+    STATE_BALANCE = 0,
+    STATE_FALLEN,
+    STATE_RISING,
+    STATE_STEP
+
+}RobotState_e;
 
 extern Leg_Typedef Leg_l;
 extern Leg_Typedef Leg_r;

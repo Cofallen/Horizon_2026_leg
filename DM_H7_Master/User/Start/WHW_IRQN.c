@@ -52,6 +52,7 @@
 #include "BM_motor.h"
 #include "observe.h"
 #include "board2board.h"
+#include "StateSelect.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -112,18 +113,14 @@ void StartGimbalTask(void const *argument)
         ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetStatus(&Leg_l, &Leg_r);
-        // if (Leg_l.status.step_flag || Leg_r.status.step_flag)
-        // {
-        //     // Chassis_DownUp(&Leg_l, &Leg_r, &ALL_MOTOR, &WHW_V_DBUS);
-        // }
-        // else
-        // {
-            Chassis_StateHandle(&Leg_l, &Leg_r);
-        // }
+        Chassis_StateHandle(&Leg_l, &Leg_r);
         
         // Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
-        ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+
+
+        // ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        // ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
+        Chassis_ControlSelect(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
         osDelay(1);
     }

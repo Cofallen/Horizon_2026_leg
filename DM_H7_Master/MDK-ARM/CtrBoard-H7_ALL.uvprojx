@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1718,6 +1718,11 @@
               <FileName>KNN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Leg\KNN.c</FilePath>
+            </File>
+            <File>
+              <FileName>StateSelect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\StateSelect.c</FilePath>
             </File>
           </Files>
         </Group>
