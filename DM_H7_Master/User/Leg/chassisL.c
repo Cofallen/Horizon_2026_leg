@@ -178,39 +178,12 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     //   object->LQR.torque_setT[1] = 0.0f;
     //   object->LQR.torque_setW = 0.0f;
     // }
-    (object->LQR.torque_setT[0] > MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[0] = MAX_TORQUE_LEG_T) : (object->LQR.torque_setT[0] < -MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[0] = -MAX_TORQUE_LEG_T) : 0;
-    (object->LQR.torque_setT[1] > MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = MAX_TORQUE_LEG_T) : (object->LQR.torque_setT[1] < -MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = -MAX_TORQUE_LEG_T) : 0;
-    (object->LQR.torque_setW > MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = MAX_TORQUE_LEG_W) : (object->LQR.torque_setW < -MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = -MAX_TORQUE_LEG_W) : 0;
+    // (object->LQR.torque_setT[0] > MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[0] = MAX_TORQUE_LEG_T) : (object->LQR.torque_setT[0] < -MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[0] = -MAX_TORQUE_LEG_T) : 0;
+    // (object->LQR.torque_setT[1] > MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = MAX_TORQUE_LEG_T) : (object->LQR.torque_setT[1] < -MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = -MAX_TORQUE_LEG_T) : 0;
+    // (object->LQR.torque_setW > MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = MAX_TORQUE_LEG_W) : (object->LQR.torque_setW < -MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = -MAX_TORQUE_LEG_W) : 0;
 }
 
 
-void Chassis_SendTorque()
-{
-    RUI_V_CONTAL.DWT_TIME.TIM7_Dtime = DWT_GetDeltaT(&RUI_V_CONTAL.DWT_TIME.TIM7_DWT_Count);
-    static uint8_t temp = 1;
-    uint8_t count = 0;
-    if (temp == 1){
-      // BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
-      //                                 Leg_r.torque_send.T1,
-      //                                Leg_l.torque_send.T2,
-      //                                Leg_r.torque_send.T2);
-        BM_Send_torque(&hfdcan2, 0x032, 0, 
-                                  Leg_r.torque_send.T1,
-                                  0,
-                                  Leg_r.torque_send.T2);
-        DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, Leg_r.torque_send.Tw, 0.0f);
-
-      // DJI_Torque_Control(&hfdcan1, 0x200, Leg_l.torque_send.Tw, 0.0f, Leg_r.torque_send.Tw, 0.0f);
-      temp = -temp;
-    }
-    else{
-      mit_ctrl(&hfdcan1, 0x02, 0,0,0,0, Leg_r.torque_send.T1);
-      mit_ctrl(&hfdcan1, 0x04, 0,0,0,0, Leg_r.torque_send.T2);
-      // mit_ctrl(&hcan1, 0x02, 0,0,0,0, 0);
-      // mit_ctrl(&hcan1, 0x04, 0,0,0,0, 0);
-      temp = -temp;
-    }
-}
 
 // 决定输出力矩，选择
 #define RATIO 1.0f

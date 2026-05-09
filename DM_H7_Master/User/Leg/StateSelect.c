@@ -222,12 +222,6 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
       right->LQR.K[11] = 0;
     }
 
-      // left->limit.W_max = MAX_TORQUE_LEG_W;
-      // right->limit.W_max = MAX_TORQUE_LEG_W;
-      // left->limit.T_max = MAX_TORQUE_LEG_T;
-      // right->limit.T_max = MAX_TORQUE_LEG_T;
-
-
     switch(left->status.robot_state)
     {
         case STATE_BALANCE:
@@ -277,6 +271,16 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
 
         break;
     }
+    
+    (left->LQR.torque_setT[0] > left->limit.T_max) ? (left->LQR.torque_setT[0] = left->limit.T_max) : (left->LQR.torque_setT[0] < -left->limit.T_max) ? (left->LQR.torque_setT[0] = -left->limit.T_max) : 0;
+    (left->LQR.torque_setT[1] > left->limit.T_max) ? (left->LQR.torque_setT[1] = left->limit.T_max) : (left->LQR.torque_setT[1] < -left->limit.T_max) ? (left->LQR.torque_setT[1] = -left->limit.T_max) : 0;
+    (left->LQR.torque_setW > left->limit.W_max) ? (left->LQR.torque_setW = left->limit.W_max) : (left->LQR.torque_setW < -left->limit.W_max) ? (left->LQR.torque_setW = -left->limit.W_max) : 0;
+
+    (right->LQR.torque_setT[0] > right->limit.T_max) ? (right->LQR.torque_setT[0] = right->limit.T_max) : (right->LQR.torque_setT[0] < -right->limit.T_max) ? (right->LQR.torque_setT[0] = -right->limit.T_max) : 0;
+    (right->LQR.torque_setT[1] > right->limit.T_max) ? (right->LQR.torque_setT[1] = right->limit.T_max) : (right->LQR.torque_setT[1] < -right->limit.T_max) ? (right->LQR.torque_setT[1] = -right->limit.T_max) : 0;
+    (right->LQR.torque_setW > right->limit.W_max) ? (right->LQR.torque_setW = right->limit.W_max) : (right->LQR.torque_setW < -right->limit.W_max) ? (right->LQR.torque_setW = -right->limit.W_max) : 0;
+
+
 }
 
 
