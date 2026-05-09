@@ -6,7 +6,7 @@
 // 应放在对应文件内
 Leg_Typedef Leg_l;
 Leg_Typedef Leg_r;
-
+RobotManager_t RobotManager;
 // #define MATH_PI 3.14159265358979323846f
 
 

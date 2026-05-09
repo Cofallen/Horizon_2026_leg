@@ -129,18 +129,11 @@ typedef struct
     struct 
     {
         uint8_t offGround;
-        uint8_t jump;
-        uint8_t stand;
-        uint16_t stand_count;
-        uint8_t step_flag;
-        uint8_t err[2];
-
-        uint8_t robot_state;
-
-        uint16_t fallen_count;
-        uint16_t rising_count;
-        uint16_t transition_count;
-        uint16_t step_count;
+        // uint8_t jump;
+        // uint8_t stand;
+        // uint16_t stand_count;
+        // uint8_t step_flag;
+        // uint8_t err[2];
 
     }status;
 
@@ -180,13 +173,27 @@ typedef struct
 
 typedef enum
 {
-    STATE_BALANCE = 0,
-    STATE_FALLEN,
-    STATE_RISING,
-    STATE_TRANSITION,
-    STATE_STEP
+    ROBOT_DISABLE = 0,
+    ROBOT_BALANCE,
+    ROBOT_FALLEN,
+    ROBOT_RISING,
+    ROBOT_TRANSITION,
+    ROBOT_STEP
 
-}RobotState_e;
+} RobotMode_e;
+
+typedef struct
+{
+    RobotMode_e mode;
+
+    uint16_t fallen_count;
+    uint16_t rising_count;
+    uint16_t transition_count;
+    uint16_t step_count;
+
+} RobotManager_t;
+
+extern RobotManager_t RobotManager;
 
 extern Leg_Typedef Leg_l;
 extern Leg_Typedef Leg_r;

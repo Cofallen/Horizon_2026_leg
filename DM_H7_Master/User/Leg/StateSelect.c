@@ -18,325 +18,375 @@
 // float b = -6.20173577;
 // float mean[] = {-30.41808307, -12.34488136, 0.00315275, -0.00464040, 1.35854588, -2.00639961, -0.01038345, 0.92982620, 9.67937703};
 // float std[] = {94.37885327, 19.92452379, 0.38786233, 1.16555753, 5.68133384, 239.56580740, 0.33913288, 0.14331179, 2.84528473};
+// 离地状态
+// left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
+// right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
+// left->status.offGround = ground_check(&Leg_l, &IMU_Data);
+// right->status.offGround = ground_check(&Leg_r, &IMU_Data);
+    float theta_diff;
+    float theta_max;
+void Robot_UpdateMode(Leg_Typedef *left,
+                      Leg_Typedef *right,
+                      DBUS_Typedef *dbus)
+{
+    float theta_l;
+    float theta_r;
 
-void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
-{   
-    // 离地状态
-    // left->status.offGround = ground_check(&Leg_l, &IMU_Data, w, b, mean, std);
-    // right->status.offGround = ground_check(&Leg_r, &IMU_Data, w, b, mean, std);
-    // left->status.offGround = ground_check(&Leg_l, &IMU_Data);
-    // right->status.offGround = ground_check(&Leg_r, &IMU_Data);
     float theta_avg;
+    // float theta_diff;
+    // float theta_max;
+
+    float pitch;
+    float pitch_rate;
+
     float L0_avg;
+
+    theta_l = left->stateSpace.theta;
+    theta_r = right->stateSpace.theta;
 
     theta_avg =
         0.5f *
-        (left->stateSpace.theta +
-         right->stateSpace.theta);
+        (theta_l + theta_r);
+
+    theta_diff =
+        fabsf(theta_l - theta_r);
+
+    theta_max =
+        MAX(fabsf(theta_l),
+            fabsf(theta_r));
+
+    pitch =
+        IMU_Data.pitch / 57.3f;
+
+    pitch_rate =
+        IMU_Data.gyro[1];
 
     L0_avg =
         0.5f *
         (left->vmc_calc.L0[POS] +
          right->vmc_calc.L0[POS]);
-
-    switch(left->status.robot_state)
+    VOFA_justfloat(theta_l, theta_r, theta_avg, theta_diff, theta_max, pitch, pitch_rate,  L0_avg,
+                        0, RobotManager.mode);
+    if(dbus->Remote.S2_u8 == 1)
     {
-        case STATE_BALANCE:
+        RobotManager.mode = ROBOT_DISABLE;
 
-            if(fabsf(left->stateSpace.theta) > 1.2f ||
-               fabsf(right->stateSpace.theta) > 1.2f)
+        RobotManager.fallen_count = 0;
+        RobotManager.rising_count = 0;
+        RobotManager.step_count = 0;
+        RobotManager.transition_count = 0;
+
+        return;
+    }
+
+    switch(RobotManager.mode)
+    {
+        case ROBOT_DISABLE:
+
+            RobotManager.mode = ROBOT_BALANCE;
+
+        break;
+
+        case ROBOT_BALANCE:
+
+            if(theta_max  > 0.8f ||
+               theta_diff > 1.80f ||
+               fabsf(pitch) > 0.70f)
             {
-                left->status.fallen_count++;
+                RobotManager.fallen_count++;
 
-                if(left->status.fallen_count > 100)
+                if(RobotManager.fallen_count > 1)
                 {
-                    left->status.robot_state =
-                        STATE_FALLEN;
+                    RobotManager.mode = ROBOT_FALLEN;
 
-                    right->status.robot_state =
-                        STATE_FALLEN;
-
-                    left->status.fallen_count = 0;
+                    RobotManager.fallen_count = 0;
                 }
             }
             else
             {
-                left->status.fallen_count = 0;
+                RobotManager.fallen_count = 0;
             }
 
             if(L0_avg > 0.34f &&
-               theta_avg > 0.8f)
+               theta_avg > 0.80f &&
+               theta_diff < 0.50f)
             {
-                left->status.step_count++;
+                RobotManager.step_count++;
 
-                if(left->status.step_count > 300)
+                if(RobotManager.step_count > 100)
                 {
-                    left->status.robot_state =
-                        STATE_STEP;
+                    RobotManager.mode = ROBOT_STEP;
 
-                    right->status.robot_state =
-                        STATE_STEP;
-
-                    left->status.step_count = 0;
+                    RobotManager.step_count = 0;
                 }
             }
             else
             {
-                left->status.step_count = 0;
+                RobotManager.step_count = 0;
             }
 
         break;
 
-        case STATE_FALLEN:
+        case ROBOT_FALLEN:
 
-            if(fabsf(left->stateSpace.theta - 1.2f) < 0.1f &&
-               fabsf(right->stateSpace.theta - 1.2f) < 0.1f)
+            if(theta_diff < 0.40f &&
+               theta_max  > 1.00f &&
+               theta_max  < 1.35f)
             {
-                left->status.rising_count++;
+                RobotManager.rising_count++;
 
-                if(left->status.rising_count > 200)
+                if(RobotManager.rising_count > 200)
                 {
-                    left->status.robot_state =
-                        STATE_RISING;
+                    RobotManager.mode = ROBOT_RISING;
 
-                    right->status.robot_state =
-                        STATE_RISING;
-
-                    left->status.rising_count = 0;
+                    RobotManager.rising_count = 0;
                 }
             }
             else
             {
-                left->status.rising_count = 0;
+                RobotManager.rising_count = 0;
             }
 
         break;
 
-        case STATE_RISING:
+        case ROBOT_RISING:
 
-            // ---------- 起立失败 ----------
-            if(fabsf(theta_avg) > 1.45f)
+            if(theta_max  > 1.45f ||
+               theta_diff > 1.80f ||
+               fabsf(pitch) > 0.90f)
             {
-                left->status.robot_state = STATE_FALLEN;
-                right->status.robot_state = STATE_FALLEN;
+                RobotManager.mode = ROBOT_FALLEN;
 
-                left->status.rising_count = 0;
+                RobotManager.rising_count = 0;
+
                 break;
             }
 
-            // ---------- 起立完成 ----------
-            if(fabsf(theta_avg) < 1.15f)
+            if(theta_max  < 1.15f &&
+               theta_diff < 0.40f)
             {
-                left->status.rising_count++;
+                RobotManager.rising_count++;
 
-                if(left->status.rising_count > 15)
+                if(RobotManager.rising_count > 15)
                 {
-                    left->status.robot_state = STATE_TRANSITION;
-                    right->status.robot_state = STATE_TRANSITION;
+                    RobotManager.mode =
+                        ROBOT_TRANSITION;
 
-                    left->status.rising_count = 0;
+                    RobotManager.rising_count = 0;
                 }
             }
             else
             {
-                left->status.rising_count = 0;
+                RobotManager.rising_count = 0;
             }
 
         break;
 
-        case STATE_TRANSITION:  // 限幅防止速度过快，起立过度2
+        case ROBOT_TRANSITION:
 
-            left->status.transition_count++;
-
-            if(left->status.transition_count > 300)
+            if(theta_max  > 1.45f ||
+               theta_diff > 1.80f)
             {
-                left->status.robot_state = STATE_BALANCE;
-                right->status.robot_state = STATE_BALANCE;
+                RobotManager.mode = ROBOT_FALLEN;
 
-                left->status.transition_count = 0;
+                RobotManager.transition_count = 0;
+
+                break;
+            }
+
+            RobotManager.transition_count++;
+
+            if(RobotManager.transition_count > 300)
+            {
+                RobotManager.mode = ROBOT_BALANCE;
+
+                RobotManager.transition_count = 0;
             }
 
         break;
 
-        case STATE_STEP:
+        case ROBOT_STEP:
 
-            if(theta_avg > 1.1f)
+            if(theta_diff > 1.80f ||
+               theta_max  > 1.40f)
             {
-                left->status.rising_count++;
-
-                if(left->status.rising_count > 200)
-                {
-                    left->status.robot_state =
-                        STATE_RISING;
-
-                    right->status.robot_state =
-                        STATE_RISING;
-
-                    left->status.rising_count = 0;
-                }
-            }
-            else
-            {
-                left->status.rising_count = 0;
+                RobotManager.mode = ROBOT_FALLEN;
             }
 
         break;
     }
 }
 
-void Chassis_FallenControl(Leg_Typedef *left,
-                           Leg_Typedef *right)
+void Robot_Control(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus, float dt)
 {
-
-}
-
-
-// 不同状态限幅+处理
-void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
-{
-    // 离地检测
-    if (left->status.offGround == 1)
+    switch(RobotManager.mode)
     {
-      left->LQR.K[0] = 0;
-      left->LQR.K[1] = 0;
-      left->LQR.K[2] = 0;
-      left->LQR.K[3] = 0;
-      left->LQR.K[4] = 0;
-      left->LQR.K[5] = 0;
-      left->LQR.K[8] = 0;
-      left->LQR.K[9] = 0;
-      left->LQR.K[10] = 0;
-      left->LQR.K[11] = 0;
-    }
-    if (right->status.offGround == 1)
-    {
-      right->LQR.K[0] = 0;
-      right->LQR.K[1] = 0;
-      right->LQR.K[2] = 0;
-      right->LQR.K[3] = 0;
-      right->LQR.K[4] = 0;
-      right->LQR.K[5] = 0;
-      right->LQR.K[8] = 0;
-      right->LQR.K[9] = 0;
-      right->LQR.K[10] = 0;
-      right->LQR.K[11] = 0;
-    }
+        case ROBOT_DISABLE:
 
-    switch(left->status.robot_state)
-    {
-        case STATE_BALANCE:
+            left->LQR.torque_setT[0] = 0.0f;
+            left->LQR.torque_setT[1] = 0.0f;
+            left->LQR.torque_setW    = 0.0f;
 
-            left->limit.T_max = MAX_TORQUE_LEG_T;
-            right->limit.T_max = MAX_TORQUE_LEG_T;
-
-            left->limit.W_max = MAX_TORQUE_LEG_W;
-            right->limit.W_max = MAX_TORQUE_LEG_W;
+            right->LQR.torque_setT[0] = 0.0f;
+            right->LQR.torque_setT[1] = 0.0f;
+            right->LQR.torque_setW    = 0.0f;
 
         break;
 
-        case STATE_FALLEN:
+        case ROBOT_BALANCE:
 
-            left->limit.T_max = 0.0f;
-            right->limit.T_max = 0.0f;
-
-            left->limit.W_max = 0.0f;
-            right->limit.W_max = 0.0f;
-
-        break;
-
-        case STATE_RISING:
-
-            left->limit.T_max = 8.0f;
-            right->limit.T_max = 8.0f;
-
-            left->limit.W_max = 0.0f;
-            right->limit.W_max = 0.0f;
-
-        break;
-        
-        case STATE_TRANSITION:
-
-            left->limit.T_max = 20.0f;
-            right->limit.T_max = 20.0f;
-
-            left->limit.W_max = 3.0f;
-            right->limit.W_max = 3.0f;
-
-        break;
-
-        case STATE_STEP:
-
-            left->limit.T_max = 0.0f;
-            right->limit.T_max = 0.0f;
-
-        break;
-    }
-    
-    (left->LQR.torque_setT[0] > left->limit.T_max) ? (left->LQR.torque_setT[0] = left->limit.T_max) : (left->LQR.torque_setT[0] < -left->limit.T_max) ? (left->LQR.torque_setT[0] = -left->limit.T_max) : 0;
-    (left->LQR.torque_setT[1] > left->limit.T_max) ? (left->LQR.torque_setT[1] = left->limit.T_max) : (left->LQR.torque_setT[1] < -left->limit.T_max) ? (left->LQR.torque_setT[1] = -left->limit.T_max) : 0;
-    (left->LQR.torque_setW > left->limit.W_max) ? (left->LQR.torque_setW = left->limit.W_max) : (left->LQR.torque_setW < -left->limit.W_max) ? (left->LQR.torque_setW = -left->limit.W_max) : 0;
-
-    (right->LQR.torque_setT[0] > right->limit.T_max) ? (right->LQR.torque_setT[0] = right->limit.T_max) : (right->LQR.torque_setT[0] < -right->limit.T_max) ? (right->LQR.torque_setT[0] = -right->limit.T_max) : 0;
-    (right->LQR.torque_setT[1] > right->limit.T_max) ? (right->LQR.torque_setT[1] = right->limit.T_max) : (right->LQR.torque_setT[1] < -right->limit.T_max) ? (right->LQR.torque_setT[1] = -right->limit.T_max) : 0;
-    (right->LQR.torque_setW > right->limit.W_max) ? (right->LQR.torque_setW = right->limit.W_max) : (right->LQR.torque_setW < -right->limit.W_max) ? (right->LQR.torque_setW = -right->limit.W_max) : 0;
-
-
-}
-
-
-// 选择控制方案
-void Chassis_ControlSelect(MOTOR_Typedef *motor,
-                           Leg_Typedef *left,
-                           Leg_Typedef *right,
-                           DBUS_Typedef *dbus,
-                           float dt)
-{
-    switch(left->status.robot_state)
-    {
-        case STATE_BALANCE:
             Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
+
             Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
+
             ChassisL_Control(left, dbus, &IMU_Data, dt);
+
             ChassisR_Control(right, dbus, &IMU_Data, dt);
 
         break;
 
-        case STATE_FALLEN:
+        case ROBOT_FALLEN:
 
-            Chassis_FallenControl(left, right);
+            left->LQR.torque_setT[0] = motor->left_front.PID_S.Output;
+
+            left->LQR.torque_setT[1] = motor->left_back.PID_S.Output;
+
+            right->LQR.torque_setT[0] = motor->right_front.PID_S.Output;
+
+            right->LQR.torque_setT[1] = motor->right_back.PID_S.Output;
+
+            left->LQR.torque_setW = 0.0f;
+            right->LQR.torque_setW = 0.0f;
 
         break;
 
-        case STATE_RISING:
+        case ROBOT_RISING:
 
-            // LQR直接限幅起立（你说的正确方案）
             Chassis_Fit_K(ChassisL_LQR_K_rising, left->vmc_calc.L0[POS], left->LQR.K);
+
             Chassis_Fit_K(ChassisR_LQR_K_rising, right->vmc_calc.L0[POS], right->LQR.K);
+
             left->target.l0  = MIN_LEG_LENGTH;
             right->target.l0 = MIN_LEG_LENGTH;
+
             ChassisL_Control(left, dbus, &IMU_Data, dt);
-            ChassisR_Control(right, dbus, &IMU_Data, dt);
 
-            // left->limit.T_max = 6.0f;
-            // right->limit.T_max = 6.0f;
-
-        break;
-
-        case STATE_TRANSITION:
-
-            Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
-            Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
-            // left->target.l0  = 0.15f;
-            // right->target.l0 = 0.15f;
-            ChassisL_Control(left, dbus, &IMU_Data, dt);
             ChassisR_Control(right, dbus, &IMU_Data, dt);
 
         break;
 
-        case STATE_STEP:
+        case ROBOT_TRANSITION:
 
-            // Chassis_DownUp(left, right, motor, dbus);
+            Chassis_Fit_K(ChassisL_LQR_K_coeffs,
+                          left->vmc_calc.L0[POS],
+                          left->LQR.K);
+
+            Chassis_Fit_K(ChassisR_LQR_K_coeffs,
+                          right->vmc_calc.L0[POS],
+                          right->LQR.K);
+
+            ChassisL_Control(left, dbus, &IMU_Data, dt);
+
+            ChassisR_Control(right, dbus, &IMU_Data, dt);
+
+        break;
+
+        case ROBOT_STEP:
+
+            left->LQR.torque_setT[0] = motor->left_front.PID_S.Output;
+
+            left->LQR.torque_setT[1] = motor->left_back.PID_S.Output;
+
+            right->LQR.torque_setT[0] = motor->right_front.PID_S.Output;
+
+            right->LQR.torque_setT[1] = motor->right_back.PID_S.Output;
+
+            left->LQR.torque_setW = 0.0f;
+            right->LQR.torque_setW = 0.0f;
 
         break;
     }
+}
+
+void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
+{
+    float T_max = 0.0f;
+    float W_max = 0.0f;
+
+    switch(RobotManager.mode)
+    {
+        case ROBOT_DISABLE:
+
+            T_max = 0.0f;
+            W_max = 0.0f;
+
+        break;
+
+        case ROBOT_BALANCE:
+
+            T_max = MAX_TORQUE_LEG_T;
+            W_max = MAX_TORQUE_LEG_W;
+
+        break;
+
+        case ROBOT_FALLEN:
+
+            T_max = 0.0f;
+            W_max = 0.0f;
+
+        break;
+
+        case ROBOT_RISING:
+
+            T_max = 8.0f;
+            W_max = 0.0f;
+
+        break;
+
+        case ROBOT_TRANSITION:
+
+            T_max = 20.0f;
+            W_max = 3.0f;
+
+        break;
+
+        case ROBOT_STEP:
+
+            T_max = 5.0f;
+            W_max = 0.0f;
+
+        break;
+    }
+    left->limit.T_max = T_max;
+    left->limit.W_max = W_max;
+
+#define LIMIT(x,max)                    \
+    do                                  \
+    {                                   \
+        if((x) > (max))  (x) = (max);   \
+        if((x) < -(max)) (x) = -(max);  \
+    }while(0)
+
+    LIMIT(left->LQR.torque_setT[0], 0);
+    LIMIT(left->LQR.torque_setT[1], 0);
+    LIMIT(left->LQR.torque_setW,    W_max);
+
+    LIMIT(right->LQR.torque_setT[0], 0);
+    LIMIT(right->LQR.torque_setT[1], 0);
+    LIMIT(right->LQR.torque_setW,    0);
+}
+
+void Robot_SendTorque(Leg_Typedef *left, Leg_Typedef *right)
+{
+    left->torque_send.T1 = -left->LQR.torque_setT[0] * RATIO;
+
+    left->torque_send.T2 = -left->LQR.torque_setT[1] * RATIO;
+
+    left->torque_send.Tw = left->LQR.torque_setW * RATIO;
+
+    right->torque_send.T1 = right->LQR.torque_setT[0] * RATIO;
+
+    right->torque_send.T2 = right->LQR.torque_setT[1] * RATIO;
+
+    right->torque_send.Tw = -right->LQR.torque_setW * RATIO;
 }

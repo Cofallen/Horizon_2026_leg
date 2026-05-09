@@ -109,16 +109,23 @@ void StartGimbalTask(void const *argument)
         ChassisL_UpdateState(&Leg_l, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         ChassisR_UpdateState(&Leg_r, &ALL_MOTOR, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
         Chassis_UpdateStateS(&Leg_l, &Leg_r, &ALL_MOTOR, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        Chassis_GetStatus(&Leg_l, &Leg_r);
-        Chassis_StateHandle(&Leg_l, &Leg_r);
         
-        // Chassis_Jump(&Leg_l, &Leg_r, &WHW_V_DBUS);
+        Robot_UpdateMode(&Leg_l,
+                     &Leg_r,
+                     &WHW_V_DBUS);
 
+        Robot_Control(&ALL_MOTOR,
+                    &Leg_l,
+                    &Leg_r,
+                    &WHW_V_DBUS,
+                    RUI_V_CONTAL.DWT_TIME.Move_Dtime);
 
-        // ChassisL_Control(&Leg_l, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        // ChassisR_Control(&Leg_r, &WHW_V_DBUS, &IMU_Data, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        Chassis_ControlSelect(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS, RUI_V_CONTAL.DWT_TIME.Move_Dtime);
-        Chassis_GetTorque(&ALL_MOTOR, &Leg_l, &Leg_r, &WHW_V_DBUS);
+        Robot_LimitOutput(&Leg_l,
+                        &Leg_r);
+
+        Robot_SendTorque(&Leg_l,
+                        &Leg_r);
+
         osDelay(1);
     }
 }
@@ -232,10 +239,10 @@ void StartK3debugTask(void const * argument)
         //                0,
         //             Leg_l.LQR.Fn,Leg_r.LQR.Fn);
         
-        VOFA_justfloat(Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta, 
-                        Leg_l.stateSpace.s, Leg_l.stateSpace.dot_s,
-                        Leg_l.stateSpace.phi, Leg_l.stateSpace.dphi
-                        ,IMU_Data.accel[0],IMU_Data.accel[1],IMU_Data.accel[2],0);
+        // VOFA_justfloat(Leg_l.stateSpace.theta, Leg_l.stateSpace.dtheta, 
+        //                 Leg_l.stateSpace.s, Leg_l.stateSpace.dot_s,
+        //                 Leg_l.stateSpace.phi, Leg_l.stateSpace.dphi
+        //                 ,IMU_Data.accel[0],IMU_Data.accel[1],IMU_Data.accel[2],0);
                         
         osDelay(2);
     }

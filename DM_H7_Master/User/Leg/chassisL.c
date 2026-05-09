@@ -62,7 +62,7 @@ static inline float left_unwrap(float theta) {
 
 // 右摆: 原始范围[-3PI/2, PI/2) -> 连续递增[0, 2PI)
 static inline float right_unwrap(float theta) {
-    return theta < -PI/2 ? theta + 2*PI : theta;
+    return theta < -PI ? theta + 2*PI : theta;
 }
 
 float kl = 1.0f, kr = 1.0f;
@@ -182,59 +182,6 @@ void ChassisL_Control(Leg_Typedef *object, DBUS_Typedef *dbus, IMU_Data_t *imu, 
     // (object->LQR.torque_setT[1] > MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = MAX_TORQUE_LEG_T) : (object->LQR.torque_setT[1] < -MAX_TORQUE_LEG_T) ? (object->LQR.torque_setT[1] = -MAX_TORQUE_LEG_T) : 0;
     // (object->LQR.torque_setW > MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = MAX_TORQUE_LEG_W) : (object->LQR.torque_setW < -MAX_TORQUE_LEG_W) ? (object->LQR.torque_setW = -MAX_TORQUE_LEG_W) : 0;
 }
-
-
-
-// 决定输出力矩，选择
-#define RATIO 1.0f
-
-void Chassis_GetTorque(MOTOR_Typedef *motor, Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
-{
-  left->torque_send.T1  = -left->LQR.torque_setT[0] * RATIO;
-  left->torque_send.T2  = -left->LQR.torque_setT[1] * RATIO;
-  left->torque_send.Tw  =  left->LQR.torque_setW * RATIO;
-  right->torque_send.T1 =  right->LQR.torque_setT[0] * RATIO;
-  right->torque_send.T2 =  right->LQR.torque_setT[1] * RATIO;
-  right->torque_send.Tw = -right->LQR.torque_setW * RATIO;
-
-  if (dbus->Remote.S2_u8 == 1)    // 离线
-  {
-    left->torque_send.T1 = 0.0f;
-    left->torque_send.T2 = 0.0f;
-    left->torque_send.Tw = 0.0f;
-    right->torque_send.T1 = 0.0f;
-    right->torque_send.T2 = 0.0f;
-    right->torque_send.Tw = 0.0f;
-  }
-  else if (left->status.stand == 1 || right->status.stand == 1 )   // 倒地TODO
-  {
-    left->torque_send.T1 = motor->left_front.PID_S.Output;
-    left->torque_send.T2 = motor->left_back.PID_S.Output;
-    left->torque_send.Tw = 0.0f;
-    right->torque_send.T1 = motor->right_front.PID_S.Output;
-    right->torque_send.T2 = motor->right_back.PID_S.Output;
-    right->torque_send.Tw = 0.0f;
-  }
-  else if (left->status.stand == 2 || right->status.stand == 2 )   // 倒地TODO
-  {
-    // left->torque_send.T1 = 0.0f;
-    left->torque_send.T2 = left->torque_send.T1 * 0.1f;
-    // left->torque_send.Tw = 0.0f;
-    // right->torque_send.T1 = 0.0f;
-    right->torque_send.T2 = right->torque_send.T1 * 0.1f;
-    // right->torque_send.Tw = 0.0f;
-  }
-  else if (Leg_l.status.step_flag || Leg_r.status.step_flag)   // 模拟磕台阶测试
-  {
-    left->torque_send.T1 = motor->left_front.PID_P.Output;
-    left->torque_send.T2 = motor->left_back.PID_P.Output;
-    left->torque_send.Tw = 0.0f;
-    right->torque_send.T1 = motor->right_front.PID_P.Output;
-    right->torque_send.T2 = motor->right_back.PID_P.Output;
-    right->torque_send.Tw = 0.0f;
-  }
-}
-
 
 
 // 获取目标值，使用规划
@@ -448,15 +395,15 @@ void Chassis_Jump(Leg_Typedef *left, Leg_Typedef *right, DBUS_Typedef *dbus)
     state = idle;
     break;
   }
-  left->status.jump = state;
-  right->status.jump = state;
+  // left->status.jump = state;
+  // right->status.jump = state;
 }
 
 // 磕台阶 只考虑后面电机即可，自动实现收腿了，可能再伸腿需要两个电机
 // 轨迹 theta 0 -> -120 -> -30 起立
 void Chassis_DownUp(Leg_Typedef *left, Leg_Typedef *right, MOTOR_Typedef *motor, DBUS_Typedef *dbus)
 {
-  if (left->status.step_flag || right->status.step_flag)    // 测试为双环控位置变化
+  // if (left->status.step_flag || right->status.step_flag)    // 测试为双环控位置变化
   {
     // 更换方式：双环控位置变化
     float left_aim = 0.0f, right_aim = 0.0f;
