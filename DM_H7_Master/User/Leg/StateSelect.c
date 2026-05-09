@@ -112,8 +112,8 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
 
         break;
 
-        case STATE_RISING:  // 作为倾斜车身
-        
+        case STATE_RISING:
+
             // ---------- 起立失败 ----------
             if(fabsf(theta_avg) > 1.45f)
             {
@@ -124,15 +124,15 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
                 break;
             }
 
-            // ---------- 起立成功 ----------
-            if(fabsf(theta_avg) < 1.1f)
+            // ---------- 起立完成 ----------
+            if(fabsf(theta_avg) < 1.15f)
             {
                 left->status.rising_count++;
 
-                if(left->status.rising_count > 10)
+                if(left->status.rising_count > 15)
                 {
-                    left->status.robot_state = STATE_BALANCE;
-                    right->status.robot_state = STATE_BALANCE;
+                    left->status.robot_state = STATE_TRANSITION;
+                    right->status.robot_state = STATE_TRANSITION;
 
                     left->status.rising_count = 0;
                 }
@@ -140,6 +140,29 @@ void Chassis_GetStatus(Leg_Typedef *left, Leg_Typedef *right)
             else
             {
                 left->status.rising_count = 0;
+            }
+
+        break;
+
+        case STATE_TRANSITION:  // 限幅防止速度过快，起立过度2
+
+            // 再次摔倒
+            // if(fabsf(theta_avg) > 1.4f)
+            // {
+            //     left->status.robot_state = STATE_FALLEN;
+            //     right->status.robot_state = STATE_FALLEN;
+
+            //     break;
+            // }
+
+            left->status.transition_count++;
+
+            if(left->status.transition_count > 300)
+            {
+                left->status.robot_state = STATE_BALANCE;
+                right->status.robot_state = STATE_BALANCE;
+
+                left->status.transition_count = 0;
             }
 
         break;
@@ -241,8 +264,18 @@ void Chassis_StateHandle(Leg_Typedef *left, Leg_Typedef *right)
             left->limit.T_max = 8.0f;
             right->limit.T_max = 8.0f;
 
-            left->limit.W_max = 1.0f;
-            right->limit.W_max = 1.0f;
+            left->limit.W_max = 0.0f;
+            right->limit.W_max = 0.0f;
+
+        break;
+        
+        case STATE_TRANSITION:
+
+            left->limit.T_max = 20.0f;
+            right->limit.T_max = 20.0f;
+
+            left->limit.W_max = 3.0f;
+            right->limit.W_max = 3.0f;
 
         break;
 
@@ -284,11 +317,24 @@ void Chassis_ControlSelect(MOTOR_Typedef *motor,
             // LQR直接限幅起立（你说的正确方案）
             Chassis_Fit_K(ChassisL_LQR_K_rising, left->vmc_calc.L0[POS], left->LQR.K);
             Chassis_Fit_K(ChassisR_LQR_K_rising, right->vmc_calc.L0[POS], right->LQR.K);
+            left->target.l0  = 0.15f;
+            right->target.l0 = 0.15f;
             ChassisL_Control(left, dbus, &IMU_Data, dt);
             ChassisR_Control(right, dbus, &IMU_Data, dt);
 
             // left->limit.T_max = 6.0f;
             // right->limit.T_max = 6.0f;
+
+        break;
+
+        case STATE_TRANSITION:
+
+            Chassis_Fit_K(ChassisL_LQR_K_coeffs, left->vmc_calc.L0[POS], left->LQR.K);
+            Chassis_Fit_K(ChassisR_LQR_K_coeffs, right->vmc_calc.L0[POS], right->LQR.K);
+            // left->target.l0  = 0.15f;
+            // right->target.l0 = 0.15f;
+            ChassisL_Control(left, dbus, &IMU_Data, dt);
+            ChassisR_Control(right, dbus, &IMU_Data, dt);
 
         break;
 

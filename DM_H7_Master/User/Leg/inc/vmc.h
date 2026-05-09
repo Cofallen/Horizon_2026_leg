@@ -139,6 +139,7 @@ typedef struct
 
         uint16_t fallen_count;
         uint16_t rising_count;
+        uint16_t transition_count;
         uint16_t step_count;
 
     }status;
@@ -182,6 +183,7 @@ typedef enum
     STATE_BALANCE = 0,
     STATE_FALLEN,
     STATE_RISING,
+    STATE_TRANSITION,
     STATE_STEP
 
 }RobotState_e;
