@@ -218,22 +218,6 @@
           <ExecCommand></ExecCommand>
           <Expression>\\CtrBoard_H7_ALL\../User/Bsp/can_bsp.c\84</Expression>
         </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>239</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134284100</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Core/Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\\../Core/Src/main.c\239</Expression>
-        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
@@ -305,6 +289,16 @@
           <count>13</count>
           <WinNumber>1</WinNumber>
           <ItemText>LegRotate,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>14</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>roll_pid</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>torque</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -2314,6 +2308,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\Leg\legRotate.c</PathWithFileName>
       <FilenameWithoutPath>legRotate.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>155</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\User\Leg\RecoveryControl.c</PathWithFileName>
+      <FilenameWithoutPath>RecoveryControl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

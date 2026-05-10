@@ -53,6 +53,7 @@
 #include "observe.h"
 #include "board2board.h"
 #include "StateSelect.h"
+#include "RecoveryControl.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -97,6 +98,7 @@ void StartGimbalTask(void const *argument)
     Vmc_Init(&Leg_l, MIN_LEG_LENGTH);
     Vmc_Init(&Leg_r, MIN_LEG_LENGTH);
     LegRotate_Init();
+    Recovery_Init();
     while (IMU_Data.pitch == 0.0f)
     {
         osDelay(1);
@@ -140,11 +142,11 @@ void StartMonitorTask(void const * argument)
     for(;;)
     {
         // BM_Send_torque(&hfdcan2, 0x032, 0,0,0,0);
-        BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
-                            Leg_r.torque_send.T1,
-                            Leg_l.torque_send.T2,
-                            Leg_r.torque_send.T2);
-        DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
+       BM_Send_torque(&hfdcan2, 0x032, Leg_l.torque_send.T1, 
+                           Leg_r.torque_send.T1,
+                           Leg_l.torque_send.T2,
+                           Leg_r.torque_send.T2);
+       DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
         
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);

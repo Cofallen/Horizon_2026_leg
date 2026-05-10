@@ -1729,6 +1729,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Leg\legRotate.c</FilePath>
             </File>
+            <File>
+              <FileName>RecoveryControl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Leg\RecoveryControl.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

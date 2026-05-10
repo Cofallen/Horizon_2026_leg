@@ -41,6 +41,9 @@ typedef struct
 
     float theta_ref_l;
     float theta_ref_r;
+
+    float target_l_final;
+    float target_r_final;
 } LegRotate_t;
 
 extern LegRotate_t LegRotate;

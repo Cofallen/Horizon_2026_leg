@@ -1,6 +1,7 @@
 #include "legRotate.h"
 #include "arm_math.h"
 #include "VOFA.h"
+#include "RecoveryControl.h"
 
 LegRotate_t LegRotate;
 
@@ -157,26 +158,24 @@ void LegRotate_Control(MOTOR_Typedef *motor,
                        Leg_Typedef *right,
                        float dt)
 {
-    float target_l;
-    float target_r;
 
     float vel_ref_l;
     float vel_ref_r;
 
-    target_l =
+    LegRotate.target_l_final =
         GetLeftTarget(LegRotate.theta_l);
 
-    target_r =
+    LegRotate.target_r_final =
         GetRightTarget(LegRotate.theta_r);
 
     LegRotate.theta_ref_l = 
         Traj_Update(LegRotate.theta_ref_l,
-                    target_l,
+                    LegRotate.target_l_final,
                     dt);
 
     LegRotate.theta_ref_r = 
         Traj_Update(LegRotate.theta_ref_r,
-                    target_r,
+                    LegRotate.target_r_final,
                     dt);
 
     vel_ref_l =
@@ -224,14 +223,18 @@ void LegRotate_Control(MOTOR_Typedef *motor,
     left->LQR.torque_setW = 0.0f;
     right->LQR.torque_setW = 0.0f;
 
+    RollRecovery_Control(motor,
+                         left,
+                         right);
+                         
     VOFA_justfloat(
         LegRotate.theta_l,
         LegRotate.theta_ref_l,
-        target_l,
+        LegRotate.target_l_final ,
 
         LegRotate.theta_r,
         LegRotate.theta_ref_r,
-        target_r,
+        LegRotate.target_r_final ,
 
         left->LQR.torque_setT[0],
         right->LQR.torque_setT[0],

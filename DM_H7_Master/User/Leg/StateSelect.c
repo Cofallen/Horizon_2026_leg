@@ -330,7 +330,7 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
 
         case ROBOT_FALLEN:
 
-            T_max = 0.3f;
+            T_max = 0.5f;
             W_max = 0.0f;
 
         break;
