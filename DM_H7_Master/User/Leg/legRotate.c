@@ -7,6 +7,7 @@ LegRotate_t LegRotate;
 
 static const float PID_POS[3] = {800.0f, 0.0f, 10000.0f};
 static const float PID_VEL[3] = {0.05f, 0.0f, 0.0f};
+uint8_t pitch_recovery_flag = 0;
 
 #define LEG_ROTATE_TARGET     1.2f          // 单次目标位置（不含圈数）
 #define LEG_ROTATE_SPEED      1.5f          // 追踪速度
@@ -177,16 +178,16 @@ void LegRotate_Control(MOTOR_Typedef *motor,
         Traj_Update(LegRotate.theta_ref_r,
                     LegRotate.target_r_final,
                     dt);
-
+                    
     vel_ref_l =
         PID_calc(&LegRotate.l_pos,
-                 LegRotate.theta_l,
-                 LegRotate.theta_ref_l);
+                LegRotate.theta_l,
+                LegRotate.theta_ref_l);
 
     vel_ref_r =
         PID_calc(&LegRotate.r_pos,
-                 LegRotate.theta_r,
-                 LegRotate.theta_ref_r);
+                LegRotate.theta_r,
+                LegRotate.theta_ref_r);
 
     left->LQR.torque_setT[0] =
         -PID_calc(&LegRotate.l_vel,
@@ -219,6 +220,21 @@ void LegRotate_Control(MOTOR_Typedef *motor,
 
     limit(&right->LQR.torque_setT[1],
            LEG_ROTATE_TORQUE_MAX);
+    
+    if(pitch_recovery_flag)
+    {
+        limit(&left->LQR.torque_setT[0],
+            0);
+
+        limit(&left->LQR.torque_setT[1],
+            0);
+
+        limit(&right->LQR.torque_setT[0],
+            0);
+
+        limit(&right->LQR.torque_setT[1],
+            0);
+    }
 
     left->LQR.torque_setW = 0.0f;
     right->LQR.torque_setW = 0.0f;
@@ -226,7 +242,10 @@ void LegRotate_Control(MOTOR_Typedef *motor,
     RollRecovery_Control(motor,
                          left,
                          right);
-                         
+    PitchRecovery_Control(motor,
+                           left,
+                           right);         
+
     VOFA_justfloat(
         LegRotate.theta_l,
         LegRotate.theta_ref_l,

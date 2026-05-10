@@ -47,6 +47,7 @@ typedef struct
 } LegRotate_t;
 
 extern LegRotate_t LegRotate;
+extern uint8_t pitch_recovery_flag;
 
 void LegRotate_Init(void);
 
