@@ -4,13 +4,13 @@
 
 LegRotate_t LegRotate;
 
-static const float PID_POS[3] = {1.0f, 0.0f, 0.0f};
-static const float PID_VEL[3] = {1.0f, 0.0f, 0.0f};
+static const float PID_POS[3] = {500.0f, 0.0f, 0.0f};
+static const float PID_VEL[3] = {0.05f, 0.0f, 0.0f};
 
-#define LEG_ROTATE_TARGET     1.2f
-#define LEG_ROTATE_SPEED      1.0f
-#define LEG_ROTATE_TORQUE_MAX 2.0f
-
+#define LEG_ROTATE_TARGET     1.2f          // 单次目标位置（不含圈数）
+#define LEG_ROTATE_SPEED      1.0f          // 追踪速度
+#define LEG_ROTATE_TORQUE_MAX 0.5f          // 最大限幅
+#define LEG_TARGET_DIFF       0.2f          // 目标差多少开启下次规划
 static inline void limit(float *x, float max)
 {
     if(*x > max)
@@ -54,7 +54,7 @@ static float GetLeftTarget(float theta_now)
         LEG_ROTATE_TARGET +
         2.0f * PI * k;
 
-    if(target > theta_now)
+    if(target - LEG_TARGET_DIFF > theta_now)
     {
         target -= 2.0f * PI;
     }
@@ -64,17 +64,15 @@ static float GetLeftTarget(float theta_now)
 
 static float GetRightTarget(float theta_now)
 {
-    float base = LEG_ROTATE_TARGET;   // 1.2
     float target;
-
     int32_t k;
 
-    // 允许所有圈数候选
-    k = (int32_t)roundf((theta_now - base) / (2.0f * PI));
+    k = (int32_t)((theta_now - LEG_ROTATE_TARGET)
+        / (2.0f * PI));
 
-    target = base + 2.0f * PI * k;
+    target = LEG_ROTATE_TARGET + 2.0f * PI * k;
 
-    if(target > theta_now)
+    if(target - LEG_TARGET_DIFF > theta_now)
     {
         target -= 2.0f * PI;
     }
@@ -103,7 +101,7 @@ void LegRotate_Init(void)
     PID_init(&LegRotate.l_pos,
              PID_POSITION,
              PID_POS,
-             2.0f,
+             100.0f,
              0.0f);
 
     PID_init(&LegRotate.l_vel,
@@ -115,7 +113,7 @@ void LegRotate_Init(void)
     PID_init(&LegRotate.r_pos,
              PID_POSITION,
              PID_POS,
-             2.0f,
+             100.0f,
              0.0f);
 
     PID_init(&LegRotate.r_vel,
@@ -171,12 +169,12 @@ void LegRotate_Control(MOTOR_Typedef *motor,
     target_r =
         GetRightTarget(LegRotate.theta_r);
 
-    LegRotate.theta_ref_l =
+    LegRotate.theta_ref_l = 
         Traj_Update(LegRotate.theta_ref_l,
                     target_l,
                     dt);
 
-    LegRotate.theta_ref_r =
+    LegRotate.theta_ref_r = 
         Traj_Update(LegRotate.theta_ref_r,
                     target_r,
                     dt);
@@ -192,22 +190,22 @@ void LegRotate_Control(MOTOR_Typedef *motor,
                  LegRotate.theta_ref_r);
 
     left->LQR.torque_setT[0] =
-        PID_calc(&LegRotate.l_vel,
-                 motor->left_front.DATA.vel,
+        -PID_calc(&LegRotate.l_vel,
+                 -motor->left_front.DATA.vel,
                  vel_ref_l);
 
     left->LQR.torque_setT[1] =
-        PID_calc(&LegRotate.l_vel,
-                 motor->left_back.DATA.vel,
+        -PID_calc(&LegRotate.l_vel,
+                 -motor->left_back.DATA.vel,
                  vel_ref_l);
 
     right->LQR.torque_setT[0] =
-        PID_calc(&LegRotate.r_vel,
+        -PID_calc(&LegRotate.r_vel,
                  motor->right_front.DATA.vel,
                  vel_ref_r);
 
     right->LQR.torque_setT[1] =
-        PID_calc(&LegRotate.r_vel,
+        -PID_calc(&LegRotate.r_vel,
                  motor->right_back.DATA.vel,
                  vel_ref_r);
 

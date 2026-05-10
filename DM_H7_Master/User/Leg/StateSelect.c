@@ -92,7 +92,7 @@ void Robot_UpdateMode(Leg_Typedef *left,
 
             if(theta_max  > 0.8f ||
                theta_diff > 1.80f ||
-               fabsf(pitch) > 0.70f)
+               fabsf(pitch) > 0.30f)
             {
                 RobotManager.fallen_count++;
 
@@ -323,21 +323,21 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
 
         case ROBOT_BALANCE:
 
-            T_max = MAX_TORQUE_LEG_T;
-            W_max = MAX_TORQUE_LEG_W;
+            T_max = 0;
+            W_max = 0;   // todo max
 
         break;
 
         case ROBOT_FALLEN:
 
-            T_max = 0.0f;
+            T_max = 0.3f;
             W_max = 0.0f;
 
         break;
 
         case ROBOT_RISING:
 
-            T_max = 8.0f;
+            T_max = 0.0f;       // todo 8
             W_max = 0.0f;
 
         break;
@@ -345,19 +345,19 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
         case ROBOT_TRANSITION:
 
             T_max = 20.0f;
-            W_max = 3.0f;
+            W_max = 0.0f;       // todo 3
 
         break;
 
         case ROBOT_STEP:
 
-            T_max = 5.0f;
+            T_max = 0.0f;       // todo 5
             W_max = 0.0f;
 
         break;
     }
     left->limit.T_max = T_max;
-    left->limit.W_max = W_max;
+    left->limit.W_max = W_max;  // 查看，可删除
 
 #define LIMIT(x,max)                    \
     do                                  \
@@ -366,12 +366,12 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
         if((x) < -(max)) (x) = -(max);  \
     }while(0)
 
-    LIMIT(left->LQR.torque_setT[0], 0);
-    LIMIT(left->LQR.torque_setT[1], 0);
-    LIMIT(left->LQR.torque_setW,    W_max);
+    LIMIT(left->LQR.torque_setT[0], T_max);
+    LIMIT(left->LQR.torque_setT[1], T_max);
+    LIMIT(left->LQR.torque_setW,    0);
 
-    LIMIT(right->LQR.torque_setT[0], 0);
-    LIMIT(right->LQR.torque_setT[1], 0);
+    LIMIT(right->LQR.torque_setT[0], T_max);
+    LIMIT(right->LQR.torque_setT[1], T_max);
     LIMIT(right->LQR.torque_setW,    0);
 }
 

@@ -58,4 +58,6 @@ void LegRotate_Control(MOTOR_Typedef *motor,
                        Leg_Typedef *right,
                        float dt);
 
+void LegRotate_Reset(void);
+
 #endif
