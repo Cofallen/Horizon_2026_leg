@@ -66,8 +66,8 @@ void Robot_UpdateMode(Leg_Typedef *left,
         0.5f *
         (left->vmc_calc.L0[POS] +
          right->vmc_calc.L0[POS]);
-    // VOFA_justfloat(theta_l, theta_r, theta_avg, theta_diff, theta_max, pitch, pitch_rate,  L0_avg,
-    //                     0, RobotManager.mode);
+//    VOFA_justfloat(theta_l, theta_r, theta_avg, theta_diff, theta_max, pitch, pitch_rate,  L0_avg,
+//                        0, RobotManager.mode);
     if(dbus->Remote.S2_u8 == 1)
     {
         RobotManager.mode = ROBOT_DISABLE;
@@ -138,7 +138,7 @@ void Robot_UpdateMode(Leg_Typedef *left,
             {
                 RobotManager.rising_count++;
 
-                if(RobotManager.rising_count > 200)
+                if(RobotManager.rising_count > 400)
                 {
                     RobotManager.mode = ROBOT_RISING;
 
@@ -323,29 +323,29 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
 
         case ROBOT_BALANCE:
 
-            T_max = 0;
-            W_max = 0;   // todo max
+            T_max = MAX_TORQUE_LEG_W;
+            W_max = MAX_TORQUE_LEG_T;   // todo max
 
         break;
 
         case ROBOT_FALLEN:
 
-            T_max = 0.5f;
+            T_max = 15.0f;
             W_max = 0.0f;
 
         break;
 
         case ROBOT_RISING:
 
-            T_max = 0.0f;       // todo 8
+            T_max = 8.0f;       // todo 8
             W_max = 0.0f;
 
         break;
 
         case ROBOT_TRANSITION:
 
-            T_max = 20.0f;
-            W_max = 0.0f;       // todo 3
+            T_max = 16.0f;
+            W_max = 1.0f;       // todo 3
 
         break;
 
@@ -368,24 +368,27 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
 
     LIMIT(left->LQR.torque_setT[0], T_max);
     LIMIT(left->LQR.torque_setT[1], T_max);
-    LIMIT(left->LQR.torque_setW,    0);
+    LIMIT(left->LQR.torque_setW,    W_max);
 
     LIMIT(right->LQR.torque_setT[0], T_max);
     LIMIT(right->LQR.torque_setT[1], T_max);
-    LIMIT(right->LQR.torque_setW,    0);
+    LIMIT(right->LQR.torque_setW,    W_max);
+
+    VOFA_justfloat(left->LQR.torque_setT[0], left->LQR.torque_setT[1],right->LQR.torque_setT[0],
+                    right->LQR.torque_setT[1], RobotManager.mode, 0,0,0,0,0);
 }
 
 void Robot_SendTorque(Leg_Typedef *left, Leg_Typedef *right)
 {
-    left->torque_send.T1 = -left->LQR.torque_setT[0] * RATIO;
+    left->torque_send.T1 = -left->LQR.torque_setT[0];
 
-    left->torque_send.T2 = -left->LQR.torque_setT[1] * RATIO;
+    left->torque_send.T2 = -left->LQR.torque_setT[1];
 
-    left->torque_send.Tw = left->LQR.torque_setW * RATIO;
+    left->torque_send.Tw = left->LQR.torque_setW;
 
-    right->torque_send.T1 = right->LQR.torque_setT[0] * RATIO;
+    right->torque_send.T1 = right->LQR.torque_setT[0];
 
-    right->torque_send.T2 = right->LQR.torque_setT[1] * RATIO;
+    right->torque_send.T2 = right->LQR.torque_setT[1];
 
-    right->torque_send.Tw = -right->LQR.torque_setW * RATIO;
+    right->torque_send.Tw = -right->LQR.torque_setW;
 }

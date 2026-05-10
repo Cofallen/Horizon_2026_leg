@@ -5,13 +5,13 @@
 
 LegRotate_t LegRotate;
 
-static const float PID_POS[3] = {800.0f, 0.0f, 10000.0f};
+static const float PID_POS[3] = {200.0f, 0.0f, 10000.0f};
 static const float PID_VEL[3] = {0.05f, 0.0f, 0.0f};
 uint8_t pitch_recovery_flag = 0;
 
 #define LEG_ROTATE_TARGET     1.2f          // 单次目标位置（不含圈数）
 #define LEG_ROTATE_SPEED      1.5f          // 追踪速度
-#define LEG_ROTATE_TORQUE_MAX 0.2f          // 最大限幅
+#define LEG_ROTATE_TORQUE_MAX 3.0f          // 最大限幅
 #define LEG_TARGET_DIFF       2.0f          // 目标差多少开启下次规划
 static inline void limit(float *x, float max)
 {
@@ -109,7 +109,7 @@ void LegRotate_Init(void)
     PID_init(&LegRotate.l_vel,
              PID_POSITION,
              PID_VEL,
-             2.0f,
+             3.0f,
              0.0f);
 
     PID_init(&LegRotate.r_pos,
@@ -121,7 +121,7 @@ void LegRotate_Init(void)
     PID_init(&LegRotate.r_vel,
              PID_POSITION,
              PID_VEL,
-             2.0f,
+             4.0f,
              0.0f);
 
     LegRotate.theta_ref_l = LEG_ROTATE_TARGET;
@@ -246,18 +246,18 @@ void LegRotate_Control(MOTOR_Typedef *motor,
                            left,
                            right);         
 
-    VOFA_justfloat(
-        LegRotate.theta_l,
-        LegRotate.theta_ref_l,
-        LegRotate.target_l_final ,
+    // VOFA_justfloat(
+    //     LegRotate.theta_l,
+    //     LegRotate.theta_ref_l,
+    //     LegRotate.target_l_final ,
 
-        LegRotate.theta_r,
-        LegRotate.theta_ref_r,
-        LegRotate.target_r_final ,
+    //     LegRotate.theta_r,
+    //     LegRotate.theta_ref_r,
+    //     LegRotate.target_r_final ,
 
-        left->LQR.torque_setT[0],
-        right->LQR.torque_setT[0],
+    //     left->LQR.torque_setT[0],
+    //     right->LQR.torque_setT[0],
 
-        left->LQR.torque_setT[1],
-        right->LQR.torque_setT[1]);
+    //     left->LQR.torque_setT[1],
+    //     right->LQR.torque_setT[1]);
 }

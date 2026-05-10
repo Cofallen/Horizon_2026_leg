@@ -6,20 +6,20 @@
 static pid_type_def roll_pid;
 static pid_type_def pitch_pid;
 
-static const float roll_param[3] = {0.1f, 0.0f, 0.0f};
-static const float pitch_param[3] = {0.001f, 0.0f, 0.0f};
+static const float roll_param[3] = {1.0f, 0.0f, 0.0f};
+static const float pitch_param[3] = {0.01f, 0.0f, 0.0f};
 
 void Recovery_Init(void)
 {
     PID_init(&roll_pid,
              PID_POSITION,
              roll_param,
-             0.4f,
+             4.0f,
              0.0f);
     PID_init(&pitch_pid,
              PID_POSITION,
              roll_param,
-             1.5f,
+             15.0f,
              0.0f);
 }
 
