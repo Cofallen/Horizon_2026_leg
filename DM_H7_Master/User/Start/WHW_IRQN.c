@@ -327,6 +327,7 @@ extern DMA_HandleTypeDef hdma_uart7_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef * huart, uint16_t Size)
 {
+    uint8_t *pData = huart->pRxBuffPtr;
 	if(huart->Instance == UART5)
 	{
 		if (Size <= 18)
@@ -354,13 +355,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef * huart, uint16_t Size)
 
     if(huart->Instance == UART7)
     {
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart7, (uint8_t *)ALL_RX.Data, 510);//裁判系统串口
-
-        uint8_t data_length_7;
-
-        data_length_7  = 510 - __HAL_DMA_GET_COUNTER(&hdma_uart7_rx);//计算接收到的数据长度
-        Read_Data_first(&ALL_RX , &User_data , data_length_7);//测试函数：待修改
-        memset((uint8_t*)ALL_RX.Data,0,data_length_7);//清零接收缓冲区
+        uint8_t *next_buf = (pData == Referee_Rx_Buf[0]) ? Referee_Rx_Buf[1] : Referee_Rx_Buf[0];
+        HAL_UARTEx_ReceiveToIdle_DMA(huart, next_buf, REFEREE_RXFRAME_LENGTH);
+        __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);//关闭 DMA 半传中断
+        Referee_System_Frame_Update(pData, 256);
     }
 }
 

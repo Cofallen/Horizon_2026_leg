@@ -66,6 +66,8 @@ select_t selects = { 0 };
 Data_RX_0x302_t Data_RX_0x302 = { 0 };
 Data_RX_0x304_t Data_RX_0x304 = { 0 };
 
+uint8_t Referee_Rx_Buf[2][REFEREE_RXFRAME_LENGTH];
+
 void Everying_Init(void)
 {
     //DWT初始化
