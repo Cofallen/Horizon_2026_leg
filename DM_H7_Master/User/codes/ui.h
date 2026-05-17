@@ -13,12 +13,21 @@ extern "C" {
 
 #include "ui_g.h"
 
-void ui_init_g_group1();
-void ui_update_g_group1();
-void ui_remove_g_group1();
-void ui_init_g_group2();
-void ui_update_g_group2();
-void ui_remove_g_group2();
+void ui_init_g_group_cap();
+void ui_update_g_group_cap();
+void ui_remove_g_group_cap();
+void ui_init_g_group_shoot();
+void ui_update_g_group_shoot();
+void ui_remove_g_group_shoot();
+void ui_init_g_group_static();
+void ui_update_g_group_static();
+void ui_remove_g_group_static();
+void ui_init_g_group_status();
+void ui_update_g_group_status();
+void ui_remove_g_group_status();
+void ui_init_g_group_vision();
+void ui_update_g_group_vision();
+void ui_remove_g_group_vision();
 
 #ifdef __cplusplus
 }
