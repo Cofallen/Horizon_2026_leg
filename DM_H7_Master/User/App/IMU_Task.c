@@ -49,6 +49,7 @@
  */
 
 #include "IMU_Task.h"
+#include "QuaternionMahony.h"
 
 #define correct_Time_define 1000    //上电去0飘 1000次取平均
 #define temp_times 300       //探测温度阈值
@@ -97,7 +98,8 @@ void INS_Task(IMU_Data_t *IMU, PID_t *imu_temp_pid)
 			IMU_QuaternionEKF_Update(
 									IMU->gyro[0],IMU->gyro[1],IMU->gyro[2],
 									IMU->accel[0],IMU->accel[1],IMU->accel[2]);
-			
+			// Mahony.Update(IMU->gyro[0],IMU->gyro[1],IMU->gyro[2],
+			// 						IMU->accel[0],IMU->accel[1],IMU->accel[2]);
 			//=============================================================================== 
 			//ekf获取姿态角度函数
 			IMU->pitch=Get_Roll();//获得pitch

@@ -54,6 +54,7 @@
 #include "board2board.h"
 #include "StateSelect.h"
 #include "RecoveryControl.h"
+#include "QuaternionMahony.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -79,10 +80,12 @@ void StartIMUTask(void const *argument)
     portTickType currentTimeIMU;
     currentTimeIMU = xTaskGetTickCount();
 
+    Mahony.Init(2.0f, 0.005f, 0.001f);
     for(;;)
     {
         INS_Task(&IMU_Data, &temppid);
         // vTaskDelayUntil(&currentTimeIMU, 1);
+        
         osDelay(1);
     }
 }

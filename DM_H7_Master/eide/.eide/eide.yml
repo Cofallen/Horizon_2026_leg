@@ -62,6 +62,7 @@ virtualFolder:
         - path: ../User/Algorithm/inc/user_lib.h
         - path: ../User/Algorithm/Bottom.c
         - path: ../User/Algorithm/inc/Bottom.h
+        - path: ../User/Algorithm/QuaternionMahony.c
       folders: []
     - name: App
       files:
