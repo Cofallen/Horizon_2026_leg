@@ -222,6 +222,11 @@ virtualFolder:
         - path: ../User/Leg/powerControl.c
         - path: ../User/Leg/powerCap.c
       folders: []
+    - name: UI
+      files:
+        - path: ../User/codes/ui_g.c
+        - path: ../User/codes/ui_interface.c
+      folders: []
 dependenceList: []
 outDir: build
 miscInfo:
@@ -264,8 +269,11 @@ targets:
         - ../User/Leg/inc
         - .cmsis/include
         - ../MDK-ARM/RTE/_CtrBoard-H7_ALL
+        - ../User/codes
       libList: []
-    excludeList: []
+    excludeList:
+      - <virtual_root>/UI/ui_1.c
+      - <virtual_root>/UI/ui_default.c
     settings:
       debugger: cortex-debug
     toolchain: AC6

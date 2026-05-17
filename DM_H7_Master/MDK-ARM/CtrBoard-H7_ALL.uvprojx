@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H723xx,USE_HAL_DRIVER,ARM_MATH_CM7,__FPU_USED=1U,__FPU_PRESENT=1U,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING,User_Debug</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../CMSIS/Core/Inc;../CMSIS/DSP/Inc/dsp;../CMSIS/DSP/Inc;../CMSIS/DSP/PrivateInclude;../User/Algorithm/inc;../User/App/inc;../User/Bsp/inc;../User/Start/Inc;..\User\Leg\inc</IncludePath>
+              <IncludePath>../Core/Inc;../USB_DEVICE/App;../USB_DEVICE/Target;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../CMSIS/Core/Inc;../CMSIS/DSP/Inc/dsp;../CMSIS/DSP/Inc;../CMSIS/DSP/PrivateInclude;../User/Algorithm/inc;../User/App/inc;../User/Bsp/inc;../User/Start/Inc;..\User\Leg\inc;..\User\codes</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1733,6 +1733,26 @@
               <FileName>RecoveryControl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Leg\RecoveryControl.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UI</GroupName>
+          <Files>
+            <File>
+              <FileName>ui_1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\codes\ui_1.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_default.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\codes\ui_default.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\codes\ui_interface.c</FilePath>
             </File>
           </Files>
         </Group>

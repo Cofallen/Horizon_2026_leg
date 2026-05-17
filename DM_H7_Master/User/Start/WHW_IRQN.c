@@ -63,10 +63,12 @@ void StartRobotUITask(void const *argument)
 {
     portTickType currentTimeRobotUI;
     currentTimeRobotUI = xTaskGetTickCount();
-	
+	RobotUI_Init();
     for(;;)
     {
-		osDelay(1);
+	RobotUI_Init();
+        // RobotUI_Update();
+		osDelay(40);
         // vTaskDelayUntil(&currentTimeRobotUI, 1);
     }
 }
