@@ -42,8 +42,8 @@ void _ui_init_g_group_cap_0() {
     ui_g_group_cap_volume->start_y = 520;
     ui_g_group_cap_volume->width = 20;
     ui_g_group_cap_volume->start_angle = 230;
-    ui_g_group_cap_volume->end_angle = 310;
-    ui_g_group_cap_volume->rx = 400;
+    ui_g_group_cap_volume->end_angle = 270;
+    ui_g_group_cap_volume->rx = 380;
     ui_g_group_cap_volume->ry = 400;
 
 
@@ -55,8 +55,9 @@ void _ui_update_g_group_cap_0() {
     for (int i = 0; i < 2; i++) {
         ui_g_group_cap_0.data[i].operate_type = 2;
     }
-
+    ui_g_group_cap_relay->number = (int32_t)(IMU_Data.pitch * 1000.0f);
     ui_proc_2_frame(&ui_g_group_cap_0);
+        
     SEND_MESSAGE((uint8_t *) &ui_g_group_cap_0, sizeof(ui_g_group_cap_0));
 }
 
@@ -140,6 +141,20 @@ void _ui_update_g_group_shoot_0() {
     for (int i = 0; i < 3; i++) {
         ui_g_group_shoot_0.data[i].operate_type = 2;
     }
+
+    float yaw = -IMU_Data.YawTotalAngle;
+
+    while (yaw < 0.0f) yaw += 360.0f;
+    while (yaw >= 360.0f) yaw -= 360.0f;
+
+    int start = (int)(yaw + 15.0f);
+    int end   = (int)(yaw - 15.0f);
+
+    if (start >= 360) start -= 360;
+    if (end < 0) end += 360;
+
+    ui_g_group_shoot_yawArc->start_angle = start;
+    ui_g_group_shoot_yawArc->end_angle = end;
 
     ui_proc_5_frame(&ui_g_group_shoot_0);
     SEND_MESSAGE((uint8_t *) &ui_g_group_shoot_0, sizeof(ui_g_group_shoot_0));

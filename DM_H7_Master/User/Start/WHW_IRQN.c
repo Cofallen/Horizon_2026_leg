@@ -66,9 +66,9 @@ void StartRobotUITask(void const *argument)
 	RobotUI_Init();
     for(;;)
     {
-	RobotUI_Init();
-        // RobotUI_Update();
-		osDelay(40);
+	// RobotUI_Init();
+        RobotUI_Update();
+		// osDelay(40);
         // vTaskDelayUntil(&currentTimeRobotUI, 1);
     }
 }

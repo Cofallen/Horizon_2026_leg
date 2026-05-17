@@ -1740,14 +1740,9 @@
           <GroupName>UI</GroupName>
           <Files>
             <File>
-              <FileName>ui_1.c</FileName>
+              <FileName>ui_g.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\codes\ui_1.c</FilePath>
-            </File>
-            <File>
-              <FileName>ui_default.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\codes\ui_default.c</FilePath>
+              <FilePath>..\User\codes\ui_g.c</FilePath>
             </File>
             <File>
               <FileName>ui_interface.c</FileName>
