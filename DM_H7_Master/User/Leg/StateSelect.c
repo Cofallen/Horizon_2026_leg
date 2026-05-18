@@ -323,8 +323,8 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
 
         case ROBOT_BALANCE:
 
-            T_max = MAX_TORQUE_LEG_W;
-            W_max = MAX_TORQUE_LEG_T;   // todo max
+            T_max = MAX_TORQUE_LEG_T;
+            W_max = MAX_TORQUE_LEG_W;   // todo max
 
         break;
 
@@ -374,8 +374,8 @@ void Robot_LimitOutput(Leg_Typedef *left, Leg_Typedef *right)
     LIMIT(right->LQR.torque_setT[1], T_max);
     LIMIT(right->LQR.torque_setW,    W_max);
 
-    VOFA_justfloat(left->LQR.torque_setT[0], left->LQR.torque_setT[1],right->LQR.torque_setT[0],
-                    right->LQR.torque_setT[1], RobotManager.mode, 0,0,0,0,0);
+    // VOFA_justfloat(left->LQR.torque_setT[0], left->LQR.torque_setT[1],right->LQR.torque_setT[0],
+    //                 right->LQR.torque_setT[1], RobotManager.mode, 0,0,0,0,0);
 }
 
 void Robot_SendTorque(Leg_Typedef *left, Leg_Typedef *right)

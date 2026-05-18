@@ -10,6 +10,7 @@
 #include "user_lib.h"
 #include "powerCap.h"
 #include "Referee.h"
+#include "vmc.h"
 
 typedef struct {
     float k1, k2, k3, k4;
@@ -29,11 +30,12 @@ void chassis_power_distribute(DJI_MOTOR_Typedef *motor[4],
                                  float I_cmd[4],
                                  float P_limit,
                                  model_t *model);
-uint8_t chassis_power_control(CONTAL_Typedef *RUI_V_CONTAL_V,
-                           User_Data_T *usr_data,
-                           model_t *model,
-                           CAP_RXDATA *CAP_GET,
-                           MOTOR_Typedef *MOTOR);
+uint8_t chassis_power_control_2wheel(MOTOR_Typedef *M,
+                                     Leg_Typedef *left,
+                                     Leg_Typedef *right,
+                                     model_t *model,
+                                     float P_limit,
+                                     float rpm_to_rad);
 
 typedef struct {
     float shunt_volt;
@@ -48,7 +50,7 @@ typedef struct {
 } ALL_POWER_RX;
 
 extern ALL_POWER_RX All_Power;
-extern float pall;
+extern model_t model;
 
 void CAN_POWER_Rx(Power_Typedef* pPower, uint8_t *rx_data);
 void Buffer_Calc(Power_Typedef* Power,User_Data_T *user_data);

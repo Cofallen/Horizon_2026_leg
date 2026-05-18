@@ -55,6 +55,7 @@
 #include "StateSelect.h"
 #include "RecoveryControl.h"
 #include "QuaternionMahony.h"
+#include "powerControl.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -93,6 +94,7 @@ void StartIMUTask(void const *argument)
 //云台
 void StartGimbalTask(void const *argument)
 {
+    Power_control_init(&model);
     // BM_EnableDisable(&hfdcan1, 0x01);
     // BM_set_ID(&hfdcan1, 2, 1);
     osDelay(100);
@@ -134,6 +136,8 @@ void StartGimbalTask(void const *argument)
         Robot_SendTorque(&Leg_l,
                         &Leg_r);
 
+        chassis_power_control_2wheel(&ALL_MOTOR, &Leg_l, &Leg_r, &model, 60.0f, model.rpm_to_rad);
+
         osDelay(1);
     }
 }
@@ -151,8 +155,9 @@ void StartMonitorTask(void const * argument)
 //                           Leg_r.torque_send.T1,
 //                           Leg_l.torque_send.T2,
 //                           Leg_r.torque_send.T2);
-//       DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
+    //   DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
         
+    DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, 0.0f, 0);
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
@@ -278,6 +283,9 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
                     break;
                 case LEG_WR:
                     RUI_F_MOTOR_CAN_RX_3508RM(&ALL_MOTOR.right_wheel.DATA, g_Can1RxData);
+                    break;
+                case 0x602:
+                    CAN_POWER_Rx(&All_Power.P_Chassis, g_Can1RxData);
                     break;
             }
         }
