@@ -66,7 +66,7 @@ select_t selects = { 0 };
 Data_RX_0x302_t Data_RX_0x302 = { 0 };
 Data_RX_0x304_t Data_RX_0x304 = { 0 };
 
-uint8_t Referee_Rx_Buf[2][REFEREE_RXFRAME_LENGTH];
+uint8_t Referee_Rx_Buf[REFEREE_RXFRAME_LENGTH];
 
 void Everying_Init(void)
 {
@@ -117,7 +117,8 @@ void Everying_Init(void)
 	//串口初始化
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *)selects.Data, 510);//图传串口
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart10, (uint8_t *)RX, 40);
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart7, (uint8_t *)ALL_RX.Data, 510);//裁判系统串口
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart7, Referee_Rx_Buf, REFEREE_RXFRAME_LENGTH);//裁判系统串口
+    __HAL_DMA_DISABLE_IT(huart7.hdmarx, DMA_IT_HT);//关闭 DMA 半传中断
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart5, DBUS_RX_DATA, 90);//遥控串口	
 }
 
