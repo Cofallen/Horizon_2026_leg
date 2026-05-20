@@ -219,6 +219,8 @@ void StartK3debugTask(void const * argument)
                                          WHW_V_DBUS.Mouse.R_State,
                                          (int8_t)WHW_V_DBUS.Mouse.X_Flt,
                                          (int8_t)WHW_V_DBUS.Mouse.Y_Flt,
+                                         User_data.robot_status.robot_level,
+                                         RobotManager.mode,
                                          IMU_Data.pitch);
         // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
         //                 IMU_Data.yaw,
