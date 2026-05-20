@@ -94,6 +94,8 @@ typedef struct
         uint8_t L_State : 4;
         uint8_t R_PressTime;
         uint8_t L_PressTime;
+        uint8_t L_last;
+        uint8_t R_last;
     } Mouse;
     //键盘
     struct
@@ -150,8 +152,8 @@ typedef union  // 使用共用体整合数据
         int64_t Mouse_X : 16;
         int64_t Mouse_Y : 16;
         int64_t Mouse_Z : 16;
-        int64_t Mouse_R : 8;
         int64_t Mouse_L : 8;
+        int64_t Mouse_R : 8;
         // 键盘数据
         uint64_t KeyBoard_W : 1;
         uint64_t KeyBoard_S : 1;
@@ -183,6 +185,8 @@ void RUI_F_DUBS_Resovled(uint8_t* Data, DBUS_Typedef *RUI_V_DBUS);
 // 鼠标滤波
 float OneFilter(float last , float now , float thresholdValue);
 
-uint8_t RUI_F_KEY_STATUS(uint64_t  KEY , uint8_t PRESS_TIME);
+uint8_t RUI_F_MOUSE_STATUS(uint8_t key, uint8_t *t, uint8_t *last);
+
+
 
 #endif

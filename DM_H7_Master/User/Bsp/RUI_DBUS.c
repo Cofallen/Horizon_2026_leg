@@ -107,19 +107,19 @@ void RUI_F_DUBS_Resovled(uint8_t* Data, DBUS_Typedef *RUI_V_DBUS)
 
 
     //*对点按和长按的区分*//
-    RUI_V_DBUS->Mouse.R_State = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.Mouse_R , RUI_V_DBUS->Mouse.R_PressTime);
-    RUI_V_DBUS->Mouse.L_State = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.Mouse_L , RUI_V_DBUS->Mouse.L_PressTime);
+    RUI_V_DBUS->Mouse.R_State = RUI_F_MOUSE_STATUS(RUI_V_DBUS_UNION.DataNeaten.Mouse_R , &RUI_V_DBUS->Mouse.R_PressTime, &RUI_V_DBUS->Mouse.R_last);
+    RUI_V_DBUS->Mouse.L_State = RUI_F_MOUSE_STATUS(RUI_V_DBUS_UNION.DataNeaten.Mouse_L , &RUI_V_DBUS->Mouse.L_PressTime, &RUI_V_DBUS->Mouse.L_last);
 
     //*键盘的按键*//
-    RUI_V_DBUS->KeyBoard.W = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.KeyBoard_W , RUI_V_DBUS->KeyBoard.W_PressTime);
-    RUI_V_DBUS->KeyBoard.A = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.KeyBoard_A , RUI_V_DBUS->KeyBoard.A_PressTime);
-    RUI_V_DBUS->KeyBoard.S = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.KeyBoard_S , RUI_V_DBUS->KeyBoard.S_PressTime);
-    RUI_V_DBUS->KeyBoard.D = RUI_F_KEY_STATUS(RUI_V_DBUS_UNION.DataNeaten.KeyBoard_D , RUI_V_DBUS->KeyBoard.D_PressTime);
+    RUI_V_DBUS->KeyBoard.W = RUI_V_DBUS_UNION.DataNeaten.KeyBoard_W;
+    RUI_V_DBUS->KeyBoard.A = RUI_V_DBUS_UNION.DataNeaten.KeyBoard_A;
+    RUI_V_DBUS->KeyBoard.S = RUI_V_DBUS_UNION.DataNeaten.KeyBoard_S ;
+    RUI_V_DBUS->KeyBoard.D = RUI_V_DBUS_UNION.DataNeaten.KeyBoard_D;
 
     //*鼠标滤波*//
-    RUI_V_DBUS->Mouse.X_Flt = OneFilter(RUI_V_DBUS->Mouse.X_Flt , (float) RUI_V_DBUS_UNION.DataNeaten.Mouse_X , 500);
-    RUI_V_DBUS->Mouse.Y_Flt = OneFilter(RUI_V_DBUS->Mouse.Y_Flt , (float) RUI_V_DBUS_UNION.DataNeaten.Mouse_Y , 500);
-    RUI_V_DBUS->Mouse.Z_Flt = OneFilter(RUI_V_DBUS->Mouse.Z_Flt , (float) RUI_V_DBUS_UNION.DataNeaten.Mouse_Z , 500);
+    RUI_V_DBUS->Mouse.X_Flt = RUI_V_DBUS_UNION.DataNeaten.Mouse_X;
+    RUI_V_DBUS->Mouse.Y_Flt = RUI_V_DBUS_UNION.DataNeaten.Mouse_Y;
+    RUI_V_DBUS->Mouse.Z_Flt = RUI_V_DBUS_UNION.DataNeaten.Mouse_Z ;
 	if(RUI_V_DBUS->Mouse.X_Flt > 1)	    RUI_V_DBUS->Mouse.X_Flt = 1;
 	if(RUI_V_DBUS->Mouse.X_Flt < -1)	RUI_V_DBUS->Mouse.X_Flt = -1;
 	if((RUI_V_DBUS->Mouse.X_Flt > -1)&&(RUI_V_DBUS->Mouse.X_Flt < 1))	RUI_V_DBUS->Mouse.X_Flt = 0;
@@ -264,28 +264,6 @@ void RUI_F_DUBS_Resovled(uint8_t* Data, DBUS_Typedef *RUI_V_DBUS)
     {
         Key_B_Lock = 0; // 开锁
     }
-	
-	RUI_V_DBUS->Mouse.L_State = RUI_V_DBUS_UNION.DataNeaten.Mouse_L;
-	if (RUI_V_DBUS->Mouse.L_State == 1 && Mouse_L_Lock == 0)
-    {
-        RUI_V_DBUS->Mouse.L_PressTime = !RUI_V_DBUS->Mouse.L_PressTime;
-        Mouse_L_Lock = 1; // 上锁
-    }
-    else if (RUI_V_DBUS->Mouse.L_State == 0 && Mouse_L_Lock == 1)
-    {
-        Mouse_L_Lock = 0; // 开锁
-    }
-	
-	RUI_V_DBUS->Mouse.R_State = RUI_V_DBUS_UNION.DataNeaten.Mouse_R;
-	if (RUI_V_DBUS->Mouse.R_State == 1 && Mouse_R_Lock == 0)
-    {
-        RUI_V_DBUS->Mouse.R_PressTime = !RUI_V_DBUS->Mouse.R_PressTime;
-        Mouse_R_Lock = 1; // 上锁
-    }
-    else if (RUI_V_DBUS->Mouse.R_State == 0 && Mouse_R_Lock == 1)
-    {
-        Mouse_R_Lock = 0; // 开锁
-    }
 }
 
 
@@ -313,31 +291,32 @@ float OneFilter(float last , float now , float thresholdValue)
         return (float) (now * numbFilter + last * (1 - numbFilter));
     }
 }
-/************************************************************万能分隔符**************************************************************
- * 	@author:			//小瑞
- *	@performance:	    //按键长按短按
- *	@parameter:		    //
- *	@time:				//23-04-26 21:40
- *	@ReadMe:			//
- ************************************************************万能分隔符**************************************************************/
-uint8_t RUI_F_KEY_STATUS(uint64_t  KEY , uint8_t PRESS_TIME)
+
+uint8_t RUI_F_MOUSE_STATUS(uint8_t key, uint8_t *t, uint8_t *last)
 {
-    if (KEY == 1)
+    // 上升沿：本帧按下，上帧没按
+    if(key && !(*last))
     {
-        if (PRESS_TIME <= 20)
-        {
-            PRESS_TIME++;
-            return RUI_DF_KEY_CLICK;
-        }
-        else
-        {
-            return  RUI_DF_KEY_PRESS; // 长按
-        }
-    }
-    else
-    {
-        PRESS_TIME = 0;
-        return  RUI_DF_KEY_UP;
+        *t = 1;
+        *last = 1;
+        return RUI_DF_KEY_CLICK;
     }
 
+    // 持续按下
+    if(key)
+    {
+        if(*t < 255) (*t)++;
+
+        *last = 1;
+
+        if(*t >= 3)
+            return RUI_DF_KEY_PRESS;
+
+        return RUI_DF_KEY_UP;
+    }
+
+    // 松开
+    *t = 0;
+    *last = 0;
+    return RUI_DF_KEY_UP;
 }

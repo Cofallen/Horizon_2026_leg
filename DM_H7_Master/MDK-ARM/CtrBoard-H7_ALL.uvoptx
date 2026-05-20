@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>96</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134227852</Address>
+          <Address>134228012</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -175,7 +175,7 @@
           <Type>0</Type>
           <LineNumber>100</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134227870</Address>
+          <Address>134228030</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -191,7 +191,7 @@
           <Type>0</Type>
           <LineNumber>91</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134227830</Address>
+          <Address>134227990</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -207,7 +207,7 @@
           <Type>0</Type>
           <LineNumber>84</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134227804</Address>
+          <Address>134227964</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -217,6 +217,38 @@
           <Filename>..\User\Bsp\can_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\CtrBoard_H7_ALL\../User/Bsp/can_bsp.c\84</Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>239</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134284588</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>../Core/Src/main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\\../Core/Src/main.c\239</Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>158</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134269808</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\User\App\IMU_Task.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\CtrBoard_H7_ALL\../User/App/IMU_Task.c\158</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -243,7 +275,7 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>WHW_V_DBUS</ItemText>
+          <ItemText>WHW_V_DBUS,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
@@ -325,6 +357,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>Power_Debug</ItemText>
         </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>DBUS_RX_DATA</ItemText>
+        </Ww>
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -380,7 +417,7 @@
 
   <Group>
     <GroupName>Bsp</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -784,7 +821,7 @@
 
   <Group>
     <GroupName>Algorithm</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -996,7 +1033,7 @@
 
   <Group>
     <GroupName>App</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1204,7 +1241,7 @@
 
   <Group>
     <GroupName>Application/User/Core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

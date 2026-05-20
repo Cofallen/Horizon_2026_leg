@@ -56,6 +56,7 @@
 #include "RecoveryControl.h"
 #include "QuaternionMahony.h"
 #include "powerControl.h"
+#include "legRotate.h"
 
 uint8_t move;
 static uint8_t TX[12] = {0x3A,0x98,0xfd,0x90,0x86,0xa7,0xff,0xf1,0xfd,0x90,0x86,0xa7};
@@ -157,7 +158,7 @@ void StartMonitorTask(void const * argument)
 //                           Leg_r.torque_send.T2);
     //   DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
         
-    DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, 0.0f, 0);
+    // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, 0.0f, 0);
         osDelay(1);
         // DJI_Torque_Control(&hfdcan1, 0x200, 0.0f, 0.0f, 0, 0);
         // DJI_Torque_Control(&hfdcan1, 0x200, Leg_r.torque_send.Tw, 0.0f, Leg_l.torque_send.Tw, 0);
@@ -209,12 +210,16 @@ void StartK3debugTask(void const * argument)
         //                 Leg_r.pid.F0_l.Pout,
         //                 Leg_r.pid.F0_l.Iout,
         //                 Leg_r.pid.F0_l.Dout);   
-        // Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
-        //                                   WHW_V_DBUS.Remote.CH3_int16,
-        //                                   WHW_V_DBUS.Remote.Dial_int16,
-        //                                   WHW_V_DBUS.Remote.S1_u8,
-        //                                   WHW_V_DBUS.Remote.S2_u8,
-        //                                   IMU_Data.pitch);
+       Board_to_board_send(&boardTxData, WHW_V_DBUS.Remote.CH2_int16, 
+                                         WHW_V_DBUS.Remote.CH3_int16,
+                                         WHW_V_DBUS.Remote.Dial_int16,
+                                         WHW_V_DBUS.Remote.S1_u8,
+                                         WHW_V_DBUS.Remote.S2_u8,
+                                         WHW_V_DBUS.Mouse.L_State,
+                                         WHW_V_DBUS.Mouse.R_State,
+                                         (int8_t)WHW_V_DBUS.Mouse.X_Flt,
+                                         (int8_t)WHW_V_DBUS.Mouse.Y_Flt,
+                                         IMU_Data.pitch);
         // VOFA_justfloat(boardRxData.dataNeaten.yaw_imu, 
         //                 IMU_Data.yaw,
         //                 (float)(boardRxData.dataNeaten.yaw_imu - IMU_Data.yaw),
